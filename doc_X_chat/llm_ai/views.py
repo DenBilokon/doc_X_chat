@@ -1,3 +1,206 @@
-from django.shortcuts import render
+import fitz  # PyMuPDF
+import os
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import JsonResponse, HttpResponseNotFound
+from django.shortcuts import render, redirect, get_object_or_404
+from dotenv import load_dotenv
+from langchain.text_splitter.sentence_text_splitter import SentenceTextSplitter
+from langchain.embeddings.openai_embeddings import OpenAIEmbeddings
+from langchain.vectorstores.annoy import Annoy
+from langchain.chains.conversational_retrieval_chain import ConversationalRetrievalChain
+from langchain.llms.openai import OpenAI
+from langchain.callbacks import get_openai_callback
+from langchain.chat_models.chat_openai import ChatOpenAI
+from langchain.memory.conversation_buffer_memory import ConversationBufferMemory
+from PyPDF2 import PdfFileReader
+from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
+from .models import ChatMessage, PDFDocument
 
-# Create your views here.
+
+def get_pdf_text(pdf):
+    """
+    Retrieves text from a PDF document.
+
+    :param pdf: PDF file.
+    :return: Extracted text from the PDF.
+    """
+    if pdf:
+        pdf_reader = PdfReader(pdf)
+        text = ''.join(page.extract_text() for page in pdf_reader.pages)
+    return text
+
+
+def get_text_chunks(text):
+    """
+    Splits text into chunks.
+
+    :param text: Input text.
+    :return: List of text chunks.
+    """
+    text_splitter = SentenceTextSplitter()
+    chunks = text_splitter.split_text(text)
+    return chunks
+
+
+def get_vectorstore(text_chunks):
+    """
+    Retrieves the vector store for text chunks.
+
+    :param text_chunks: List of text chunks.
+    :return: Knowledge base vector store.
+    """
+    embeddings = OpenAIEmbeddings()
+    knowledge_base = Annoy.from_texts(text_chunks, embeddings)
+    return knowledge_base
+
+
+def get_conversation_chain(vectorstore):
+    """
+    Retrieves the conversation chain.
+
+    :param vectorstore: Vector store.
+    :return: Conversational retrieval chain.
+    """
+    llm = ChatOpenAI()
+    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
+    conversation_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=vectorstore.as_retriever(),
+        memory=memory
+    )
+    return conversation_chain
+
+
+@login_required(login_url="/login/")
+def upload_pdf(request):
+    """
+    Handles the PDF upload.
+
+    :param request: HTTP request.
+    :return: JSON response.
+    """
+    if request.method == 'POST':
+        form = PDFUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            pdf_document = request.FILES['pdf_document']
+            # Save the PDF document to the database
+            pdf = PDFDocument(user=request.user, title=pdf_document.name)
+            pdf.documentContent = get_pdf_text(pdf_document)
+            pdf.save()
+            return JsonResponse({'message': 'PDF uploaded successfully.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid form data.'}, status=400)
+    else:
+        form = PDFUploadForm()
+    return render(request, 'ask_question.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+def ask_question(request):
+    """
+    Handles the user's question and generates a response.
+
+    :param request: HTTP request.
+    :return: Rendered page with the response.
+    """
+    load_dotenv()
+    chat_history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')  # Retrieve chat history for the logged-in user
+    chat_response = ''
+    user_pdfs = PDFDocument.objects.filter(user=request.user)
+    user_question = ""
+
+    if request.method == 'POST':
+        user_question = request.POST.get('user_question')
+        selected_pdf_id = request.POST.get('selected_pdf')
+        selected_pdf = get_object_or_404(PDFDocument, id=selected_pdf_id)
+        text_chunks = get_text_chunks(selected_pdf.documentContent)
+
+        knowledge_base = get_vectorstore(text_chunks)
+        conversation_chain = get_conversation_chain(knowledge_base)
+
+        with get_openai_callback() as cb:
+            response = conversation_chain.get_response(user_question)
+
+        chat_response = response
+        chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response)
+        chat_message.save()
+
+    context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question}
+
+    return render(request, 'ask_question.html', {'user_pdfs': user_pdfs, **context})
+
+
+@login_required(login_url="/login/")
+def view_pdf(request, pdf_id):
+    """
+    Displays a PDF document.
+
+    :param request: HTTP request.
+    :param pdf_id: ID of the PDF document.
+    :return: Rendered page with the PDF document.
+    """
+    pdf = PDFDocument.objects.get(id=pdf_id)
+    return render(request, 'view_pdf.html', {'pdf': pdf})
+
+
+@login_required(login_url="/login/")
+def view_chat_history(request):
+    """
+    Displays the chat history for the logged-in user.
+
+    :param request: HTTP request.
+    :return: Rendered page with chat history.
+    """
+    chat_messages = ChatMessage.objects.filter(user=request.user)
+    return render(request, 'view_chat_history.html', {'chat_messages': chat_messages})
+
+
+def list_pdfs(request):
+    """
+    Lists PDF documents for the logged-in user.
+
+    :param request: HTTP request.
+    :return: Rendered page with the list of PDF documents.
+    """
+    pdfs = PDFDocument.objects.filter(user=request.user)
+    return render(request, 'edit_pdf.html', {'pdfs': pdfs})
+
+
+def delete_pdf(request, pdf_id):
+    """
+    Deletes a PDF document.
+
+    :param request: HTTP request.
+    :param pdf_id: ID of the PDF document to delete.
+    :return: Redirect or error response.
+    """
+    try:
+        pdfs = PDFDocument.objects.get(id=pdf_id)
+        pdf_title = getattr(pdfs, 'document', pdfs.title)
+        pdfs.delete()
+        return redirect('/pdfs/')
+    except PDFDocument.DoesNotExist:
+        # Handle the case where the PDFDocument with the given id does not exist
+        return HttpResponseNotFound("PDF not found")
+
+
+def update_pdf(request, pdf_id):
+    """
+    Updates a PDF document.
+
+    :param request: HTTP request.
+    :param pdf_id: ID of the PDF document to update.
+    :return: Rendered page with the updated PDF document.
+    """
+    pdf = get_object_or_404(PDFDocument, pk=pdf_id)
+    if request.method == 'POST':
+        form = PDFDocumentForm2(request.POST, instance=pdf)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Pdf updated successfully.')
+            return redirect('/pdfs/')
+    else:
+        form = PDFUpdateForm(instance=pdf)
+    return render(request, 'update_pdf.html', {'form': form, 'pdf': pdf})
