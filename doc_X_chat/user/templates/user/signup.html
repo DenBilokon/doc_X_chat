@@ -1,0 +1,83 @@
+{% extends 'quotes/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <br>
+    {% if form.errors %}
+    <span class="alert alert-danger" role="alert">{{form.non_field_errors}}</span>
+    {% endif %}
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="text-center">
+
+        <div class="form-box">
+            <form action="{% url 'users:register' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h2 class="titleForm">SignUp</h2>
+                <br>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="username" placeholder="Username">
+                    <span>{{form.errors.username}}</span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="first_name" placeholder="First name">
+                    <span>{{form.errors.first_name}}</span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="last_name" placeholder="Last name">
+                    <span>{{form.errors.last_name}}</span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="email" name="email" placeholder="Email">
+                    <span>{{form.errors.email}}</span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="password" name="password1" placeholder="Password1">
+                    <span>{{form.errors.password1}}</span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="password" name="password2" placeholder="Password2">
+                    <span>{{form.errors.password2}}</span>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary btn">Reset</button>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-box {
+        width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f7f7f7;
+        border: 5px solid #ccc;
+        border-radius: 15px;
+        background-image: url("https://i.pinimg.com/originals/2d/6a/de/2d6aded61c85e45cee5b1ce692d1ab97.gif");
+        background-size: 180% auto;
+        background-position: center ;
+        background-repeat: no-repeat;
+    }
+
+    /* Медіа-запит для екранів з максимальною шириною 768px */
+    @media (max-width: 768px) {
+    .form-box {
+        width: 90%; /* Зменшуємо ширину до 90% від загальної ширини екрану */
+        padding: 10px; /* Зменшуємо внутрішній відступ */
+        background-size: 140% auto;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+</style>
+{% endblock %}
+
