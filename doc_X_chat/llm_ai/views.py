@@ -19,6 +19,8 @@ from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument
 
 
+load_dotenv()
+
 def get_pdf_text(pdf):
     """
     Retrieves text from a PDF document.
@@ -105,7 +107,7 @@ def ask_question(request):
     :param request: HTTP request.
     :return: Rendered page with the response.
     """
-    load_dotenv()
+    
     chat_history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')  # Retrieve chat history for the logged-in user
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
