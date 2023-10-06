@@ -1,0 +1,16 @@
+{% extends 'quotes/base.html' %}
+
+{% block content %}
+<div class="container">
+    <br>
+    <div class="text-center">
+        <a href="/"><img src="https://i.pinimg.com/564x/07/33/d9/0733d9d73a29496d52857be60e13f1c9.jpg" height="250"></a>
+    </div>
+    <br>
+    <div class="text-center">
+        <img src="{{user.avatar}}" class="rounded">
+    </div>
+    <h4 class="text-center">{{ user.avatar }}</h4>
+    <h2 class="text-center">there must be a user here</h2>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+
+    <link rel="stylesheet" href="{% static 'chat_llm/style.css' %}">
+    <link rel="stylesheet" href="https://bootswatch.com/5/flatly/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="shortcut icon" href="/static/chat_llm/img/iconX.png">
+    <title>doc X chat</title>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                <img src="{% static 'chat_llm/img/iconX.png' %}" height="40" alt="docXchat Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                    <button type="button" class="btn btn-primary">LIBRARIES</button>
+                    <div class="btn-group" role="group">
+                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                            <a class="dropdown-item" href="https://getbootstrap.com/" target="_blank">Bootstrap</a>
+                            <a class="dropdown-item" href="https://docs.djangoproject.com/en/4.2/" target="_blank">Django</a>
+                            <a class="dropdown-item" href="https://bootswatch.com/morph/" target="_blank">Bootswatch</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-dark" href="/admin">Administration</a>
+                </li>
+                {% endif %}
+                {% if user.is_authenticated %}
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ user.username }}
+                        {% if avatar_url %}
+                        <img src="{{ avatar_url }}" alt="Avatar" height="40" style="border-radius: 50%;">
+                        {% else %}
+                        <img src="https://i.pinimg.com/564x/a5/82/9a/a5829ac0d2b9d70943c41c6f48e5acea.jpg"
+                             alt="Placeholder" height="40" style="border-radius: 50%;">
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/users/profile">Profile</a></li>
+                        <li><a class="dropdown-item" href="/users/logout">Logout</a></li>
+                    </ul>
+                </li>
+
+                {% else %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary" href="/users/signup">Sign up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary" href="/users/signin">Login</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="text-center">
+                {% if user.is_authenticated %}
+                <div class="btn-group-vertical" role="group" aria-label="Button Group">
+                    <a href="{% url 'contacts:main' %}" class="btn btn-lg btn-primary">CONTACTS</a>
+                    <a href="{% url 'notes:main' %}" class="btn btn-lg btn-primary">NOTES</a>
+                    <a href="{% url 'file_manager:upload_picture' %}" class="btn btn-lg btn-primary">FILE MANAGER</a>
+                    <a href="{% url 'news:home' %}" class="btn btn-lg btn-primary">NEWS</a>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'adminconsole:home' %}" class="btn btn-lg btn-primary">Admin Console</a>
+                    {% endif %}
+                </div>
+                <hr>
+                {% endif %}
+
+                {% block content %} {% endblock %}
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer fixed-bottom">
+        <div class="container">
+            <div class="social mb-1">
+                <a href="https://github.com/DenBilokon/FreeChatAi.git" target="_blank"
+                   rel="noopener noreferre">
+                    <img src="https://s.dou.ua/assets/img/github.svg" width="25" height="25"></a>
+            </div>
+            <div class="fs-5 text-center">
+                <span class="big-text" style="font-size: 2em;">X</span> <span class="small-text"
+                                                                              style="font-size: 1em;">TEAM &copy; 2023</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
+</div>
+</body>
+<style>
+    body {
+        background-image: url("/static/users/img/logo-no-background.png");
+        background-size: 60% auto;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-position: top;
+    }
+
+
+</style>
+</html>

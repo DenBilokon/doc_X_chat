@@ -50,9 +50,8 @@ INSTALLED_APPS = [
     # 'allauth.socialaccount',
     # 'allauth.socialaccount.providers.google',
     # 'allauth.socialaccount.providers.github',
-    "llm_ai",
-    "user",
-    "chat",
+    "chat_llm",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -144,7 +143,7 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     'github': {
         'SCOPE': [
-            'user',
+            'users',
             'repo',
             'read:org',
         ],
