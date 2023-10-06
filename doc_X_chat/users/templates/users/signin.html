@@ -19,10 +19,10 @@
 
         <div class="form-box">
             <a href="/" class="bg-image-link"></a>
+            <h4 class="titleForm">LOGIN</h4>
             <form action="{% url 'users:login' %}" method="POST" enctype="multipart/form-data">
-
                 {% csrf_token %}
-                <h2 class="titleForm">Login:</h2>
+
                 <br>
                 <div class="form-group">
                     <input class="form-control" type="text" name="username" placeholder="Username">
@@ -77,6 +77,7 @@
         margin: 0 auto;
         padding: 20px 20px 60px 20px;
         background-color: #f7f7f7;
+        background-color: rgba(247, 247, 247, 0.9); /* 0.9 - це рівень прозорості */
         border: 5px solid #ccc;
         border-radius: 15px;
     }
