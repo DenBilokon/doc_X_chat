@@ -8,7 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from cloudinary.exceptions import Error as CloudinaryError
 
-from .forms import RegisterForm, AvatarForm
+from .forms import RegisterForm, AvatarForm, UpdateUserForm
 from .models import Avatar
 
 
@@ -18,7 +18,7 @@ class RegisterView(View):
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect(to='quotes:home')
+            return redirect(to='chat_llm:home')
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
@@ -55,6 +55,20 @@ def profile(request):
 
 
 @login_required
+def update_user(request):
+    if request.method == 'POST':
+        form = UpdateUserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated!")
+            return redirect('users:profile')
+    else:
+        form = UpdateUserForm(instance=request.user)
+
+    return render(request, 'users/profile.html', {'form': form})
+
+
+@login_required
 def upload_avatar(request):
     """
     The upload_avatar function allows a users to upload an avatar image.
@@ -88,4 +102,4 @@ def upload_avatar(request):
 
 def signup_redirect(request):
     messages.error(request, "Something wrong here, it may be that you already have account!")
-    return redirect(to='quotes:home')
+    return redirect(to='chat_llm:home')
