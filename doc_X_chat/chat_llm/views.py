@@ -1,62 +1,33 @@
-from django.shortcuts import render
-from dotenv import load_dotenv
 
-from django.shortcuts import render
-from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.chains.question_answering import load_qa_chain
-from langchain.llms import OpenAI
-from langchain.callbacks import get_openai_callback
-from .forms import RegistrationForm, PDFUploadForm
-from django.contrib.auth import login, authenticate, logout
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.models import User
-from .models import ChatMessage, PDFDocument
-from langchain.chat_models import ChatOpenAI
-from django.contrib.auth.decorators import login_required
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationalRetrievalChain
-from django.http import HttpResponse, JsonResponse
-
-from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import PDFDocument
-from .forms import PDFUpdateForm, PDFDocumentForm2
+# import fitz  # PyMuPDF
 import os
-from django.http import HttpResponseNotFound
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import JsonResponse, HttpResponseNotFound
+from django.shortcuts import render, redirect, get_object_or_404
 from dotenv import load_dotenv
 
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores.faiss import FAISS
+from langchain.chains import ConversationalRetrievalChain
+from langchain.llms.openai import OpenAI
+from langchain.callbacks import get_openai_callback
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
 
-vector_store = None
-conversation_chain = None
-pdfname = None
-pdfsize = None
-scripttext = None
+from PyPDF2 import PdfFileReader
+from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
+from .models import ChatMessage, PDFDocument
+
+
 
 load_dotenv()
-
 
 def main(request):
     # avatar = Avatar.objects.filter(user_id=request.user.id).first()
     return render(request, 'chat_llm/index.html', context={})
-
-
-def get_vectorstore(text_chunks):
-    """
-    Retrieves the vector store for text chunks.
-
-    :param text_chunks: List of text chunks.
-    :return: Knowledge base vector store.
-    """
-    embeddings = OpenAIEmbeddings()
-    knowledge_base = FAISS.from_texts(text_chunks, embeddings)
-    return knowledge_base
-
 
 def get_pdf_text(pdf):
     """
@@ -65,9 +36,8 @@ def get_pdf_text(pdf):
     :param pdf: PDF file.
     :return: Extracted text from the PDF.
     """
-    text = None
     if pdf:
-        pdf_reader = PdfReader(pdf)
+        pdf_reader = PdfFileReader(pdf)
         text = ''.join(page.extract_text() for page in pdf_reader.pages)
     return text
 
@@ -79,14 +49,31 @@ def get_text_chunks(text):
     :param text: Input text.
     :return: List of text chunks.
     """
-    text_splitter = CharacterTextSplitter(separator="\n", chunk_size=1000, chunk_overlap=200, length_function=len)
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     chunks = text_splitter.split_text(text)
-    # print(chunks)
     return chunks
 
 
+def get_vectorstore(text_chunks):
+    """
+    Retrieves the vector store for text chunks.
+
+    :param text_chunks: List of text chunks.
+    :return: Knowledge base vector store.
+    """
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+    knowledge_base = FAISS.from_texts(text_chunks, embeddings)
+    return knowledge_base
+
+
 def get_conversation_chain(vectorstore):
-    llm = ChatOpenAI()
+    """
+    Retrieves the conversation chain.
+
+    :param vectorstore: Vector store.
+    :return: Conversational retrieval chain.
+    """
+    llm = ChatOpenAI(model="gpt-3.5-turbo")
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
@@ -96,39 +83,31 @@ def get_conversation_chain(vectorstore):
     return conversation_chain
 
 
+@login_required(login_url="/login/")
 def upload_pdf(request):
+    """
+    Handles the PDF upload.
+
+    :param request: HTTP request.
+    :return: JSON response.
+    """
     if request.method == 'POST':
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
-            pdf = PDFDocument(user=request.user, title=pdf_document.name,
-                              documentContent=process_uploaded_pdf(pdf_document))
+            # Save the PDF document to the database
+            pdf = PDFDocument(user=request.user, title=pdf_document.name)
+            pdf.documentContent = get_pdf_text(pdf_document)
             pdf.save()
-        # else:
-        #     return JsonResponse({'error': 'Invalid form data.'}, status=400)
+            return JsonResponse({'message': 'PDF uploaded successfully.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid form data.'}, status=400)
     else:
         form = PDFUploadForm()
-
-    user_pdfs = PDFDocument.objects.filter(user=request.user)
-
-    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
+    return render(request, 'ask_question.html', {'form': form})
 
 
-def process_uploaded_pdf(pdf_file):
-    """
-    Processes the uploaded PDF document.
-
-    :param pdf_file: Uploaded PDF file.
-    :return: Extracted raw text from the PDF.
-    """
-    raw_text = get_pdf_text(pdf_file)
-    # print("Extracted PDF text:", raw_text)
-    # text_chunks = get_text_chunks(raw_text)
-    # print(text_chunks)
-    return raw_text
-
-
-@login_required
+@login_required(login_url="/login/")
 def ask_question(request):
     """
     Handles the user's question and generates a response.
@@ -136,9 +115,8 @@ def ask_question(request):
     :param request: HTTP request.
     :return: Rendered page with the response.
     """
-    load_dotenv()
-    chat_history = ChatMessage.objects.filter(user=request.user).order_by(
-        'timestamp')  # Retrieve chat history for the logged-in user
+    
+    chat_history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')  # Retrieve chat history for the logged-in user
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     user_question = ""
@@ -150,43 +128,18 @@ def ask_question(request):
         text_chunks = get_text_chunks(selected_pdf.documentContent)
 
         knowledge_base = get_vectorstore(text_chunks)
+        conversation_chain = get_conversation_chain(knowledge_base)
 
-        docs = knowledge_base.similarity_search(user_question)
-
-        llm = OpenAI()
-        chain = load_qa_chain(llm, chain_type="stuff")
         with get_openai_callback() as cb:
-            response = chain.run(input_documents=docs, question=user_question)
+            response = conversation_chain.get_response(user_question)
 
         chat_response = response
-        print(chat_response)
         chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response)
         chat_message.save()
 
     context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question}
 
     return render(request, 'ask_question.html', {'user_pdfs': user_pdfs, **context})
-
-
-def process_user_question(pdf, user_question):
-    """
-    Processes the user's question with a PDF document.
-
-    :param pdf: PDF document content.
-    :param user_question: User's question.
-    :return: Response to the user's question.
-    """
-    embeddings = OpenAIEmbeddings()
-    knowledge_base = FAISS.from_texts(pdf, embeddings)
-
-    docs = knowledge_base.similarity_search(user_question)
-
-    llm = OpenAI()
-    chain = load_qa_chain(llm, chain_type="stuff")
-    with get_openai_callback() as cb:
-        response = chain.run(input_documents=docs, question=user_question)
-
-        return response
 
 
 @login_required(login_url="/login/")
