@@ -45,14 +45,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'django.contrib.sites',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.google',
-    # 'allauth.socialaccount.providers.github',
-    "llm_ai",
-    "user",
-    "chat",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    "chat_llm",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -63,6 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "doc_X_chat.urls"
@@ -78,7 +78,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                # 'hw_django.context_processors.avatar_url',
+                'doc_X_chat.context_processors.avatar_url',
             ],
         },
     },
@@ -91,7 +91,7 @@ WSGI_APPLICATION = "doc_X_chat.wsgi.application"
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASSWORD'),
@@ -128,7 +128,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',  # Авторизація через django-allauth
 )
 
-SITE_ID = 1
+SITE_ID = 5
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
@@ -144,7 +144,7 @@ SOCIALACCOUNT_PROVIDERS = {
     },
     'github': {
         'SCOPE': [
-            'user',
+            'users',
             'repo',
             'read:org',
         ],
