@@ -5,16 +5,17 @@
 
 <div class="container">
     <br>
-    {% if form.errors %}
-    <span class="alert alert-danger" role="alert">{{form.non_field_errors}}</span>
-    {% endif %}
-    {% if messages %}
-    <div>
+    <!-- Повідомлення та помилки -->
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{form.non_field_errors}}
+            {{form.username.errors}}
+            {{form.password.errors}}
+        </div>
+        {% endif %}
         {% for message in messages %}
-        <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">{{ message }}</div>
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
         {% endfor %}
-    </div>
-    {% endif %}
     <div class="text-center">
 
         <div class="form-box">
@@ -122,5 +123,16 @@
     setTimeout(hideMessage, 5000);
 
 </style>
+
+{% if form.errors or messages %}
+<script>
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000);
+</script>
+{% endif %}
 {% endblock %}
 
