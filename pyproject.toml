@@ -11,6 +11,15 @@ python = "^3.10"
 django = "^4.2.6"
 django-environ = "^0.11.2"
 psycopg2 = "^2.9.9"
+fitz = "^0.0.1.dev2"
+python-dotenv = "^1.0.0"
+langchain = "^0.0.309"
+pypdf2 = "^3.0.1"
+openai = "^0.28.1"
+djangorestframework = "^3.14.0"
+tiktoken = "^0.5.1"
+faiss-cpu = "^1.7.4"
+streamlit = "^1.27.2"
 
 
 [build-system]
