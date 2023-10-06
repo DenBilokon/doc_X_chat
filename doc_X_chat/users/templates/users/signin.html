@@ -4,42 +4,52 @@
 {% block content %}
 
 <div class="container">
-
     <br>
     <div class="text-center">
+        <!-- Повідомлення та помилки -->
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{form.non_field_errors}}
+            {{form.username.errors}}
+            {{form.password.errors}}
+        </div>
+        {% endif %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
         <div class="form-box">
             <a href="/" class="bg-image-link"></a>
             <h4 class="titleForm">LOGIN</h4>
+
             <form action="{% url 'users:login' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-
                 <br>
                 <div class="form-group">
                     <input class="form-control" type="text" name="username" placeholder="Username">
-                    <span>{{form.errors.username}}</span>
                 </div>
                 <br>
                 <div class="form-group">
                     <input class="form-control" type="password" name="password" placeholder="Password">
-                    <span>{{form.errors.password}}</span>
                 </div>
                 <br>
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="reset" class="btn btn-secondary btn">Reset</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
                 <br>
                 <div class="mt-2.5">
                     <span>Don't have an account?</span>
                     <a href="/users/signup">Sign up</a>
                 </div>
                 <br>
-                <a href="{% provider_login_url 'google' %}" target="_blank" rel="noopener noreferre"
-                   style="margin-left: 12px; border: 1px solid #cccccc; padding: 5px; display: inline-block; border-radius: 5px; text-decoration: none;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="32"
-                         height="32"><i> Continue with Google </i>
-                </a>
-                <br>
 
-                <div class="small text-right" style="position: absolute; right: 10px; bottom: 10px;">
+                <a href="{% provider_login_url 'google' %}" target="_blank" rel="noopener noreferrer"
+                   class="google-login">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="32"
+                         height="32">
+                    <i> Continue with Google </i>
+                </a>
+
+                <br>
+                <div class="small text-right forgot-password">
                     <a href="{% url 'users:password_reset' %}" class="text-center"><i>Forgot Password?</i></a>
                 </div>
             </form>
@@ -47,50 +57,52 @@
     </div>
 </div>
 <br>
-    {% if form.errors %}
-    <span class="alert alert-dismissible alert-danger" role="alert">{{form.non_field_errors}}</span>
-    {% endif %}
-    {% if messages %}
-    <div class="alert alert-dismissible alert-secondary">
-        {% for message in messages %}
-        <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">{{ message }}</div>
-        {% endfor %}
-    </div>
-    {% endif %}
+
 <style>
     .bg-image-link {
         display: block;
-        width: 35px; /* Ширина вашого фонового зображення (або те значення, яке вам потрібне) */
-        height: 35px; /* Висота вашого фонового зображення (або те значення, яке вам потрібне) */
-        position: absolute; /* Абсолютне позиціонування відносно .form-box */
-        top: 10px; /* Верхній відступ */
-        right: 10px; /* Лівий відступ */
+        width: 35px;
+        height: 35px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
         background-image: url("{% static 'chat_llm/img/iconX.png' %}");
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        z-index: 10; /* Переконайтеся, що цей елемент завжди знаходиться зверху */
+        z-index: 10;
     }
     .form-box {
         position: relative;
         width: 400px;
         margin: 0 auto;
         padding: 20px 20px 60px 20px;
-        background-color: rgba(247, 247, 247, 0.9); /* 0.9 - це рівень прозорості */
+        background-color: rgba(247, 247, 247, 0.9);
         border: 5px solid #ccc;
         border-radius: 15px;
     }
-
-    /* Медіа-запит для екранів з максимальною шириною 768px */
-    @media (max-width: 768px) {
-        .form-box {
-            position: relative;
-            width: 90%; /* Зменшуємо ширину до 90% від загальної ширини екрану */
-            padding: 10px; /* Зменшуємо внутрішній відступ */
-        }
+    .google-login {
+        margin-left: 12px;
+        border: 1px solid #cccccc;
+        padding: 5px;
+        display: inline-block;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+    .forgot-password {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
     }
 
+    @media (max-width: 768px) {
+        .form-box {
+            width: 90%;
+            padding: 10px;
+        }
+    }
 </style>
+
 {% if form.errors or messages %}
 <script>
     setTimeout(function(){
@@ -98,7 +110,7 @@
         alerts.forEach(function(alert){
             alert.style.display = "none";
         });
-    }, 5000); // 5000 мілісекунд = 5 секунд
+    }, 5000);
 </script>
 {% endif %}
 
