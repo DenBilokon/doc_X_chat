@@ -81,29 +81,10 @@
     </div>
 </nav>
 <br>
+
 <div class="container">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="text-center">
-                {% if user.is_authenticated %}
-                <div class="btn-group-vertical" role="group" aria-label="Button Group">
-                    <a href="{% url 'contacts:main' %}" class="btn btn-lg btn-primary">CONTACTS</a>
-                    <a href="{% url 'notes:main' %}" class="btn btn-lg btn-primary">NOTES</a>
-                    <a href="{% url 'file_manager:upload_picture' %}" class="btn btn-lg btn-primary">FILE MANAGER</a>
-                    <a href="{% url 'news:home' %}" class="btn btn-lg btn-primary">NEWS</a>
-                    {% if user.is_superuser %}
-                    <a href="{% url 'adminconsole:home' %}" class="btn btn-lg btn-primary">Admin Console</a>
-                    {% endif %}
-                </div>
-                <hr>
-                {% endif %}
 
-                {% block content %} {% endblock %}
-            </div>
-        </div>
-
-    </div>
-
+    {% block content %} {% endblock %}
     <footer class="footer fixed-bottom">
         <div class="container">
             <div class="social mb-1">
