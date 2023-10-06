@@ -28,27 +28,36 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">ADMINISTRATION</a>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+                {% endif %}
                 {% if user.is_authenticated %}
-                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-                    <button type="button" class="btn btn-primary">LIBRARIES</button>
-                    <div class="btn-group" role="group">
-                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                            <a class="dropdown-item" href="https://getbootstrap.com/" target="_blank">Bootstrap</a>
-                            <a class="dropdown-item" href="https://docs.djangoproject.com/en/4.2/" target="_blank">Django</a>
-                            <a class="dropdown-item" href="https://bootswatch.com/morph/" target="_blank">Bootswatch</a>
-                        </div>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">LIBRARIES</a>
+                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <a class="dropdown-item" href="https://getbootstrap.com/" target="_blank">Bootstrap</a>
+                        <a class="dropdown-item" href="https://docs.djangoproject.com/en/4.2/"
+                           target="_blank">Django</a>
+                        <a class="dropdown-item" href="https://bootswatch.com/flatly/"
+                           target="_blank">Bootswatch</a>
                     </div>
-                </div>
+                </li>
+
                 {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto">
-                {% if user.is_superuser %}
-                <li class="nav-item">
-                    <a class="btn btn-outline-dark" href="/admin">Administration</a>
-                </li>
-                {% endif %}
+
                 {% if user.is_authenticated %}
 
                 <li class="nav-item dropdown">
@@ -81,29 +90,10 @@
     </div>
 </nav>
 <br>
+
 <div class="container">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="text-center">
-                {% if user.is_authenticated %}
-                <div class="btn-group-vertical" role="group" aria-label="Button Group">
-                    <a href="{% url 'contacts:main' %}" class="btn btn-lg btn-primary">CONTACTS</a>
-                    <a href="{% url 'notes:main' %}" class="btn btn-lg btn-primary">NOTES</a>
-                    <a href="{% url 'file_manager:upload_picture' %}" class="btn btn-lg btn-primary">FILE MANAGER</a>
-                    <a href="{% url 'news:home' %}" class="btn btn-lg btn-primary">NEWS</a>
-                    {% if user.is_superuser %}
-                    <a href="{% url 'adminconsole:home' %}" class="btn btn-lg btn-primary">Admin Console</a>
-                    {% endif %}
-                </div>
-                <hr>
-                {% endif %}
 
-                {% block content %} {% endblock %}
-            </div>
-        </div>
-
-    </div>
-
+    {% block content %} {% endblock %}
     <footer class="footer fixed-bottom">
         <div class="container">
             <div class="social mb-1">
@@ -125,12 +115,12 @@
 </body>
 <style>
     body {
-        background-image: url("/static/users/img/logo-no-background.png");
-        background-size: 60% auto;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-position: top;
-    }
+    background-image: url("/static/chat_llm/img/docsXchat.png");
+    background-size: 15% auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* ця властивість зафіксує фонове зображення */
+}
 
 
 </style>
