@@ -1,7 +1,4 @@
 from django.shortcuts import render
-from dotenv import load_dotenv
-
-from django.shortcuts import render
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -21,13 +18,10 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from django.http import HttpResponse, JsonResponse
 
-from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import PDFDocument
 from .forms import PDFUpdateForm, PDFDocumentForm2
-import os
 from django.http import HttpResponseNotFound
 from dotenv import load_dotenv
 
