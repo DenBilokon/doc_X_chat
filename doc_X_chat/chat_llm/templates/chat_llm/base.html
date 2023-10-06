@@ -18,7 +18,7 @@
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="/">
-                <img src="{% static 'chat_llm/img/iconX.png' %}" height="40" alt="docXchat Logo">
+                <img src="{% static 'chat_llm/img/logoX.gif' %}" height="50" alt="logoXgif">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
@@ -44,6 +44,13 @@
                     <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
                     <hr class="d-lg-none my-2 text-white-50">
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="upload_pdf/">CHATS</a>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                        aria-haspopup="true" aria-expanded="false">LIBRARIES</a>
@@ -55,6 +62,7 @@
                            target="_blank">Bootswatch</a>
                     </div>
                 </li>
+
                 <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
                     <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
                     <hr class="d-lg-none my-2 text-white-50">
@@ -92,15 +100,14 @@
                     <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
                     <hr class="d-lg-none my-2 text-white-50">
                 </li>
+
                 {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto">
-
                 {% if user.is_authenticated %}
-
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">
                         {{ user.username }}
                         {% if avatar_url %}
                         <img src="{{ avatar_url }}" alt="Avatar" height="50" style="border-radius: 20%;">
@@ -109,15 +116,21 @@
                              alt="Placeholder" height="40" style="border-radius: 50%;">
                         {% endif %}
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/users/profile">Profile</a></li>
-                        <li><a class="dropdown-item" href="/users/logout">Logout</a></li>
-                    </ul>
+                    <div class="dropdown-menu" style="transform: translateX(-20px);">
+                        <a class="dropdown-item" href="/users/profile">Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/users/logout">Logout</a>
+                    </div>
                 </li>
+
 
                 {% else %}
                 <li class="nav-item">
                     <a class="btn btn-outline-secondary" href="/users/signup">Sign up</a>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
                 </li>
                 <li class="nav-item">
                     <a class="btn btn-outline-secondary" href="/users/signin">Login</a>
