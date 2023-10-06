@@ -1,3 +1,4 @@
+
 # import fitz  # PyMuPDF
 import os
 from django.contrib import messages
@@ -6,6 +7,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from dotenv import load_dotenv
+
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores.faiss import FAISS
@@ -14,9 +16,11 @@ from langchain.llms.openai import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
+
 from PyPDF2 import PdfFileReader
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument
+
 
 
 load_dotenv()

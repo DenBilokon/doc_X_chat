@@ -5,6 +5,19 @@
 
 <br>
 <div class="text-center">
+
+    <!-- Повідомлення та помилки -->
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{form.non_field_errors}}
+            {{form.username.errors}}
+            {{form.password.errors}}
+        </div>
+        {% endif %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
+
     <div class="form-box">
         <a href="/" class="bg-image-link"></a>
         <form action="{% url 'users:upload_avatar' %}" method="post" enctype="multipart/form-data">
@@ -18,14 +31,6 @@
         </form>
     </div>
 </div>
-
-{% if messages %}
-<div>
-    {% for message in messages %}
-    <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
 
 <style>
     .bg-image-link {
@@ -62,4 +67,14 @@
 
 </style>
 
+{% if form.errors or messages %}
+<script>
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000);
+</script>
+{% endif %}
 {% endblock %}
