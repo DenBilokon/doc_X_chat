@@ -78,7 +78,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                # 'hw_django.context_processors.avatar_url',
+                'doc_X_chat.context_processors.avatar_url',
             ],
         },
     },
