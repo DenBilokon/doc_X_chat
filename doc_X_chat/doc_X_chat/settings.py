@@ -128,7 +128,11 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',  # Авторизація через django-allauth
 )
 
+<<<<<<< Updated upstream
 SITE_ID = 1
+=======
+SITE_ID = 6
+>>>>>>> Stashed changes
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
