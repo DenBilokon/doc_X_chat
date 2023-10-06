@@ -44,6 +44,13 @@
                     <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
                     <hr class="d-lg-none my-2 text-white-50">
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="upload_pdf/">CHATS</a>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                        aria-haspopup="true" aria-expanded="false">LIBRARIES</a>
@@ -55,6 +62,45 @@
                            target="_blank">Bootswatch</a>
                     </div>
                 </li>
+
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">OUR PROJECTS</a>
+                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <a class="dropdown-item" href="https://xmara.fly.dev/" target="_blank">Xmara (by X-team)</a>
+                        <a class="dropdown-item" href="https://quotes-greenjuiced.fly.dev/"
+                           target="_blank">Quotes (by Denis Bilokon)</a>
+                        <a class="dropdown-item" href="https://sanyavas-django.fly.dev/"
+                           target="_blank">Quotes (by Oleksandr Vasylyna)</a>
+                    </div>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">X-team GIT</a>
+                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <a class="dropdown-item" href="https://github.com/DenBilokon"
+                           target="_blank">Denis Bilokon</a>
+                        <a class="dropdown-item" href="https://github.com/Sanyavas/sanyavas"
+                           target="_blank">Oleksandr Vasylyna</a>
+                        <a class="dropdown-item" href="https://github.com/denzai83"
+                           target="_blank">Denis Zaytsev</a>
+                        <a class="dropdown-item" href="https://github.com/OleksiiLatypov"
+                           target="_blank">Oleksii Latypov</a>
+                    </div>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+
                 {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto">
@@ -64,7 +110,7 @@
                        aria-haspopup="true" aria-expanded="false">
                         {{ user.username }}
                         {% if avatar_url %}
-                        <img src="{{ avatar_url }}" alt="Avatar" height="40" style="border-radius: 50%;">
+                        <img src="{{ avatar_url }}" alt="Avatar" height="50" style="border-radius: 20%;">
                         {% else %}
                         <img src="https://i.pinimg.com/564x/a5/82/9a/a5829ac0d2b9d70943c41c6f48e5acea.jpg"
                              alt="Placeholder" height="40" style="border-radius: 50%;">
@@ -101,11 +147,11 @@
     {% block content %} {% endblock %}
     <footer class="footer fixed-bottom">
         <div class="container">
-            <div class="social mb-1">
-                <a href="https://github.com/DenBilokon/FreeChatAi.git" target="_blank"
-                   rel="noopener noreferre">
-                    <img src="https://s.dou.ua/assets/img/github.svg" width="25" height="25"></a>
-            </div>
+            <!--            <div class="social mb-1">-->
+            <!--                <a href="https://github.com/DenBilokon/doc_X_chat" target="_blank"-->
+            <!--                   rel="noopener noreferre">-->
+            <!--                    <img src="https://s.dou.ua/assets/img/github.svg" width="25" height="25"></a>-->
+            <!--            </div>-->
             <div class="fs-5 text-center">
                 <span class="big-text" style="font-size: 2em;">X</span> <span class="small-text"
                                                                               style="font-size: 1em;">TEAM &copy; 2023</span>
@@ -127,6 +173,18 @@
     background-attachment: fixed; /* ця властивість зафіксує фонове зображення */
 }
 
+
+</style>
+<style>
+    .nav-link.dropdown-toggle {
+        margin-right: 30px; /* Змініть значення за бажанням */
+    }
+
+</style>
+<style>
+    .nav-item {
+        margin-right: 20px; /* Змініть значення за бажанням */
+    }
 
 </style>
 </html>

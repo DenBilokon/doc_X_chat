@@ -22,5 +22,5 @@ urlpatterns = [
     path('', include('chat_llm.urls')),
     path('users/', include('users.urls')),
     path('accounts/', include('allauth.urls')),
-    # path('chat_llm/', include('chat_llm.urls')),
+    path('chat_llm/', include('chat_llm.urls')),
 ]

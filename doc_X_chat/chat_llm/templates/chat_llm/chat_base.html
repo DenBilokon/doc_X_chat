@@ -1,0 +1,37 @@
+{% extends 'chat_llm/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Download files</h2>
+            <ul>
+                {% for pdf in user_pdfs %}
+                <li>
+                    <a href=#>{{ pdf.title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-8">
+            <h2>Завантажити новий файл</h2>
+            <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Завантажити</button>
+            </form>
+            <hr>
+            <h2>Історія чату</h2>
+            <ul>
+                {% for chat_message in chat_history %}
+                <li>
+                    {{ chat_message.user.username }} ({{ chat_message.timestamp }}):<br>
+                    Question: {{ chat_message.message }}<br>
+                    Answer: {{ chat_message.answer }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
