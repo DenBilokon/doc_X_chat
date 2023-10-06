@@ -28,27 +28,32 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">ADMINISTRATION</a>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+                {% endif %}
                 {% if user.is_authenticated %}
-                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-                    <button type="button" class="btn btn-primary">LIBRARIES</button>
-                    <div class="btn-group" role="group">
-                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                            <a class="dropdown-item" href="https://getbootstrap.com/" target="_blank">Bootstrap</a>
-                            <a class="dropdown-item" href="https://docs.djangoproject.com/en/4.2/" target="_blank">Django</a>
-                            <a class="dropdown-item" href="https://bootswatch.com/morph/" target="_blank">Bootswatch</a>
-                        </div>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">LIBRARIES</a>
+                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <a class="dropdown-item" href="https://getbootstrap.com/" target="_blank">Bootstrap</a>
+                        <a class="dropdown-item" href="https://docs.djangoproject.com/en/4.2/"
+                           target="_blank">Django</a>
+                        <a class="dropdown-item" href="https://bootswatch.com/flatly/"
+                           target="_blank">Bootswatch</a>
                     </div>
-                </div>
+                </li>
+
                 {% endif %}
             </ul>
             <ul class="navbar-nav ms-auto">
-                {% if user.is_superuser %}
-                <li class="nav-item">
-                    <a class="btn btn-outline-dark" href="/admin">Administration</a>
-                </li>
-                {% endif %}
+
                 {% if user.is_authenticated %}
 
                 <li class="nav-item dropdown">
