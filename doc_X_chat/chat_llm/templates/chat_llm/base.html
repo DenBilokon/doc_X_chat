@@ -28,12 +28,16 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
                 {% if user.is_superuser %}
                 <li class="nav-item">
                     <a class="nav-link" href="/admin">ADMINISTRATION</a>
                 </li>
                 <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
-                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
                     <hr class="d-lg-none my-2 text-white-50">
                 </li>
                 {% endif %}
@@ -111,12 +115,12 @@
 </body>
 <style>
     body {
-        background-image: url("/static/users/img/logo-no-background.png");
-        background-size: 60% auto;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-position: top;
-    }
+    background-image: url("/static/chat_llm/img/docsXchat.png");
+    background-size: 15% auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* ця властивість зафіксує фонове зображення */
+}
 
 
 </style>
