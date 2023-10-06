@@ -104,6 +104,22 @@
             padding: 10px; /* Зменшуємо внутрішній відступ */
         }
     }
+    // Функція для автоматичного приховування повідомлення після певного часу
+    function hideMessage() {
+        var errorMessage = document.getElementById("error-message");
+        var message = document.getElementById("message");
+
+        if (errorMessage) {
+            errorMessage.style.display = "none";
+        }
+
+        if (message) {
+            message.style.display = "none";
+        }
+    }
+
+    // Запуск функції приховування через 5 секунд
+    setTimeout(hideMessage, 5000);
 
 </style>
 {% endblock %}

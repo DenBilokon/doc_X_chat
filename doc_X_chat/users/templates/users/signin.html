@@ -4,19 +4,9 @@
 {% block content %}
 
 <div class="container">
-    <br>
-    {% if form.errors %}
-    <span class="alert alert-danger" role="alert">{{form.non_field_errors}}</span>
-    {% endif %}
-    {% if messages %}
-    <div>
-        {% for message in messages %}
-        <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">{{ message }}</div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    <div class="text-center">
 
+    <br>
+    <div class="text-center">
         <div class="form-box">
             <a href="/" class="bg-image-link"></a>
             <h4 class="titleForm">LOGIN</h4>
@@ -56,7 +46,17 @@
         </div>
     </div>
 </div>
-
+<br>
+    {% if form.errors %}
+    <span class="alert alert-dismissible alert-danger" role="alert">{{form.non_field_errors}}</span>
+    {% endif %}
+    {% if messages %}
+    <div class="alert alert-dismissible alert-secondary">
+        {% for message in messages %}
+        <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 <style>
     .bg-image-link {
         display: block;
@@ -76,7 +76,6 @@
         width: 400px;
         margin: 0 auto;
         padding: 20px 20px 60px 20px;
-        background-color: #f7f7f7;
         background-color: rgba(247, 247, 247, 0.9); /* 0.9 - це рівень прозорості */
         border: 5px solid #ccc;
         border-radius: 15px;
@@ -92,5 +91,15 @@
     }
 
 </style>
+{% if form.errors or messages %}
+<script>
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000); // 5000 мілісекунд = 5 секунд
+</script>
+{% endif %}
 
 {% endblock %}
