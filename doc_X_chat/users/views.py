@@ -46,18 +46,18 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
 @login_required
 def profile(request):
     """
-    The profile function is used to render the profile page of a user.
+    The profile function is used to render the profile page of a users.
     """
     user = request.user
     user_id = request.user.id
     avatar = Avatar.objects.filter(user_id=user_id).first()
-    return render(request, 'users/profile.html', context={'user': user, 'avatar': avatar})
+    return render(request, 'users/profile.html', context={'users': user, 'avatar': avatar})
 
 
 @login_required
 def upload_avatar(request):
     """
-    The upload_avatar function allows a user to upload an avatar image.
+    The upload_avatar function allows a users to upload an avatar image.
     """
     avatar = Avatar.objects.filter(user_id=request.user.id).first()
     form = AvatarForm()  # Instantiate the form

@@ -6,13 +6,13 @@ from django.utils import timezone
 
 # # Create your models here.
 # class CustomProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     users = models.OneToOneField(User, on_delete=models.CASCADE)
 #     phone = models.CharField(max_length=15)
 #     address = models.CharField(max_length=100)
 #
 #
 #     def __str__(self):
-#         return self.user.username
+#         return self.users.username
 
 
 EXTENSIONS_IMG = ['jpeg', 'png', 'jpg', 'svg', 'gif']
