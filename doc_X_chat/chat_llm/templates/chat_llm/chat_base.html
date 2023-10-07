@@ -2,16 +2,28 @@
 {% load static %}
 {% block content %}
 <div class="container">
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{form.non_field_errors}}
+        {{form.username.errors}}
+        {{form.password.errors}}
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col-md-3">
             <h2>File history</h2>
-            <ul>
-                {% for pdf in user_pdfs %}
-                <li>
-                    <a href=#>{{ pdf.title }}</a>
-                </li>
-                {% endfor %}
-            </ul>
+            <div class="card text-white bg-success mb-4" style="max-width: 20rem;">
+                <div class="card-header">Chat history</div>
+                <div class="card-body">
+                    {% if user_pdfs %}
+                    {% for pdf in user_pdfs %}
+                    <h4 class="card-title" href=#>{{pdf.title }}</h4>
+                    {% endfor %}
+                    {% else %}
+                    <h4 class="card-title" href=#>No chats :(</h4>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         <div class="col-md-9">
             <h2>Upload new PDF</h2>
