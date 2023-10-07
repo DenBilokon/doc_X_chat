@@ -1,0 +1,31 @@
+.currency-block h6,
+.table-1 th,
+.table-1 td {
+    font-size: 12px;
+}
+
+.table-1 {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.table-1 th,
+.table-1 td {
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.table-1 th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.table-1 tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table-1 tbody tr:hover {
+    background-color: #e9e9e9;
+}
