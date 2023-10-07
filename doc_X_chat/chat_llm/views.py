@@ -19,7 +19,7 @@ from langchain.memory import ConversationBufferMemory
 
 from PyPDF2 import PdfFileReader
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
-from .models import ChatMessage, PDFDocument
+from .models import ChatMessage, PDFDocument, UserData
 
 
 
@@ -91,20 +91,36 @@ def upload_pdf(request):
     :param request: HTTP request.
     :return: JSON response.
     """
+    user = request.user
+
+    # Отримати обмеження для користувача залежно від плану підписки
+    max_files_allowed = user.max_files_allowed_for_plan()
+
     if request.method == 'POST':
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
-            # Save the PDF document to the database
-            pdf = PDFDocument(user=request.user, title=pdf_document.name)
+
+            # Перевірити, чи користувач перевищив обмеження для завантажених файлів
+            if user.total_files_uploaded >= max_files_allowed:
+                return JsonResponse({'error': 'Ви досягли обмеження для завантажених файлів.'}, status=400)
+
+            # Збільшити кількість завантажених файлів користувача
+            user.total_files_uploaded += 1
+            user.save()
+
+            # Зберегти PDF-документ у базі даних
+            pdf = PDFDocument(user=user, title=pdf_document.name)
             pdf.documentContent = get_pdf_text(pdf_document)
             pdf.save()
+
             return JsonResponse({'message': 'PDF uploaded successfully.'}, status=200)
         else:
-            return JsonResponse({'error': 'Invalid form data.'}, status=400)
+            return JsonResponse({'error': 'Недійсні дані форми.'}, status=400)
     else:
         form = PDFUploadForm()
-    return render(request, 'ask_question.html', {'form': form})
+        user_pdfs = PDFDocument.objects.filter(user=request.user)
+    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
 
 
 @login_required(login_url="/login/")

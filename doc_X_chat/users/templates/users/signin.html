@@ -41,12 +41,7 @@
                 </div>
                 <br>
 
-                <a href="{% provider_login_url 'google' %}" target="_blank" rel="noopener noreferrer"
-                   class="google-login">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="32"
-                         height="32">
-                    <i> Continue with Google </i>
-                </a>
+
 
                 <br>
                 <div class="small text-right forgot-password">
@@ -57,6 +52,16 @@
     </div>
 </div>
 <br>
+
+<script>
+    // повідомлення зникає через 5 сек
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000);
+</script>
 
 <style>
     .bg-image-link {
@@ -102,16 +107,5 @@
         }
     }
 </style>
-
-{% if form.errors or messages %}
-<script>
-    setTimeout(function(){
-        var alerts = document.querySelectorAll(".alert");
-        alerts.forEach(function(alert){
-            alert.style.display = "none";
-        });
-    }, 5000);
-</script>
-{% endif %}
 
 {% endblock %}
