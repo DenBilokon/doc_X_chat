@@ -1,0 +1,54 @@
+{% extends 'chat_llm/base.html' %}
+
+{% block content %}
+<br>
+<h4 class="text-center"><b>User Statistic</b></h4>
+<table class="table table-hover" id="userTable">
+    <thead>
+    <tr>
+        <th>User id</th>
+        <th>Username</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Email</th>
+        <th>Is Superuser</th>
+        <th>Is Staff</th>
+        <th>Is Active</th>
+        <th>Date Joined</th>
+        <th>Last Login</th>
+        <th>Inactive time</th>
+        <th>Subscribe Plan</th>
+        <th>Total Files Uploaded</th>
+        <th>Total Questions Asked</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for men in users_data %}
+    <tr>
+        <td>{{ men.user.id }}</td>
+        <td>{{ men.user.username }}</td>
+        <td>{{ men.user.first_name }}</td>
+        <td>{{ men.user.last_name }}</td>
+        <td>{{ men.user.email }}</td>
+        <td>{{ men.user.is_superuser }}</td>
+        <td>{{ men.user.is_staff }}</td>
+        <td>{{ men.user.is_active }}</td>
+        <td>{{ men.user.date_joined }}</td>
+        <td>{{ men.user.last_login }}</td>
+        <td>{{ men.time_since_last_login }}</td>
+        <td>{{ men.user_data.subscribe_plan }}</td>
+        <td>{{ men.user_data.total_files_uploaded }}</td>
+        <td>{{ men.user_data.total_questions_asked }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<style>
+    .table th,
+    .table td {
+        font-size: 11px; /* Встановіть розмір шрифту, який вам підходить */
+    }
+</style>
+
+{% endblock %}
