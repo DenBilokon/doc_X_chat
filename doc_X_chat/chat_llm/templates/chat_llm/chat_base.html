@@ -3,8 +3,8 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-4">
-            <h2>Download files</h2>
+        <div class="col-md-3">
+            <h2>File history</h2>
             <ul>
                 {% for pdf in user_pdfs %}
                 <li>
@@ -13,15 +13,15 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="col-md-8">
-            <h2>Завантажити новий файл</h2>
+        <div class="col-md-9">
+            <h2>Upload new PDF</h2>
             <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit">Завантажити</button>
+                <button type="submit">Upload</button>
             </form>
             <hr>
-            <h2>Історія чату</h2>
+            <h2>Chat</h2>
             <ul>
                 {% for chat_message in chat_history %}
                 <li>
