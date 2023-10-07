@@ -2,7 +2,8 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView, FormView
 from .forms import LoginForm
-from .views import RegisterView, ResetPasswordView, profile, upload_avatar, signup_redirect, update_user
+from .views import RegisterView, ResetPasswordView, profile, upload_avatar, signup_redirect, update_user, \
+    user_plan_subscription
 
 app_name = "users"
 
@@ -28,4 +29,5 @@ urlpatterns = [
     path('profile/', profile, name='profile'),
     path('social/signup/', signup_redirect, name='signup_redirect'),
     path('update_user/', update_user, name='update_user'),
+    path('user_plan_subscription/', user_plan_subscription, name='user_plan_subscription'),
 ]

@@ -28,7 +28,7 @@
 
             {% else %}
             <img src="https://i.pinimg.com/564x/a5/82/9a/a5829ac0d2b9d70943c41c6f48e5acea.jpg" alt="Placeholder"
-                 style="width: 200px;">
+                 style="width: 200px; border-radius: 50%; border: 1px solid black;">
             {% endif %}
             <form action="{% url 'users:upload_avatar' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -38,6 +38,71 @@
                     <input type="file" name="image" style="display: none;">
                 </button>
             </form>
+            <!-- Модальне вікно з інформацією про плани -->
+            <div class="modal fade" id="plansModal" tabindex="-1" aria-labelledby="plansModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="plansModalLabel">Плани користувача</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul>
+                                <li>
+                                    <strong>Free</strong>
+                                    <ul>
+                                        <li>Ідеальний для новачків, які тільки починають користуватися нашим сервісом.
+                                        </li>
+                                        <li>Можливість завантажити до 5 файлів.</li>
+                                        <li>Можливість задати до 20 питань.</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>Gold</strong>
+                                    <ul>
+                                        <li>Перший крок до розширених можливостей. Підходить для користувачів, які
+                                            активно користуються нашими послугами.
+                                        </li>
+                                        <li>Можливість завантажити до 50 файлів.</li>
+                                        <li>Можливість задати до 200 питань.</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>Ultra</strong>
+                                    <ul>
+                                        <li>Наш найкращий план для професіоналів і бізнесу.</li>
+                                        <li>Можливість завантажити до 500 файлів.</li>
+                                        <li>Можливість задати до 2000 питань.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <hr>
+                            <p>Вибирайте план, який найкраще підходить для ваших потреб, і отримуйте максимальний досвід
+                                користування нашим сервісом!</p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group-container">
+                <!-- при натисканні відкривається модальне вікно з інформацією про плани -->
+                {% if user_plan.subscribe_plan == "free" %}
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#plansModal">
+                    {{ user_plan.subscribe_plan }}
+                </button>
+                {% elif user_plan.subscribe_plan == "gold" %}
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#plansModal">
+                    {{ user_plan.subscribe_plan }}
+                </button>
+                {% elif user_plan.subscribe_plan == "ultra" %}
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#plansModal">
+                    {{ user_plan.subscribe_plan }}
+                </button>
+                {% endif %}
+            </div>
             <br>
             <form action="{% url 'users:update_user' %}" method="post">
                 {% csrf_token %}
@@ -138,7 +203,14 @@
 .profile-input:focus {
     border-bottom: 1px solid black;
 }
-
+.modal-body {
+    text-align: left; /* Це правило прибере центрування тексту */
+}
+.btn-group-container { /* Новий контейнер для вашого блоку кнопок */
+    position: absolute;
+    top: 10px; /* Можна налаштувати за потреби */
+    left: 10px; /* Можна налаштувати за потреби */
+}
 </style>
 
 {% endblock %}

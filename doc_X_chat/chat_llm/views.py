@@ -22,12 +22,13 @@ from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
 
 
-
 load_dotenv()
+
 
 def main(request):
     # avatar = Avatar.objects.filter(user_id=request.user.id).first()
     return render(request, 'chat_llm/index.html', context={})
+
 
 def get_pdf_text(pdf):
     """
@@ -36,6 +37,7 @@ def get_pdf_text(pdf):
     :param pdf: PDF file.
     :return: Extracted text from the PDF.
     """
+    text = None
     if pdf:
         pdf_reader = PdfFileReader(pdf)
         text = ''.join(page.extract_text() for page in pdf_reader.pages)
