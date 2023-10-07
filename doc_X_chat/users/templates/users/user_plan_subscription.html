@@ -1,0 +1,91 @@
+{% extends 'chat_llm/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center">
+        <!-- Модальне вікно з інформацією про плани -->
+        <div class="modal fade" id="plansModal" tabindex="-1" aria-labelledby="plansModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="plansModalLabel">Плани користувача</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul>
+                            <li>
+                                <strong>Free</strong>
+                                <ul>
+                                    <li>Ідеальний для новачків, які тільки починають користуватися нашим сервісом.
+                                    </li>
+                                    <li>Можливість завантажити до 5 файлів.</li>
+                                    <li>Можливість задати до 20 питань.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Gold</strong>
+                                <ul>
+                                    <li>Перший крок до розширених можливостей. Підходить для користувачів, які
+                                        активно користуються нашими послугами.
+                                    </li>
+                                    <li>Можливість завантажити до 50 файлів.</li>
+                                    <li>Можливість задати до 200 питань.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Ultra</strong>
+                                <ul>
+                                    <li>Наш найкращий план для професіоналів і бізнесу.</li>
+                                    <li>Можливість завантажити до 500 файлів.</li>
+                                    <li>Можливість задати до 2000 питань.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <hr>
+                        <p>Вибирайте план, який найкраще підходить для ваших потреб, і отримуйте максимальний досвід
+                            користування нашим сервісом!</p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрити</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group-container">YOUR PLAN:
+            <!-- при натисканні відкривається модальне вікно з інформацією про плани -->
+            {% if user_plan.subscribe_plan == "free" %}
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#plansModal">
+                {{ user_plan.subscribe_plan }}
+            </button>
+            {% elif user_plan.subscribe_plan == "gold" %}
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#plansModal">
+                {{ user_plan.subscribe_plan }}
+            </button>
+            {% elif user_plan.subscribe_plan == "ultra" %}
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#plansModal">
+                {{ user_plan.subscribe_plan }}
+            </button>
+            {% endif %}
+        </div>
+        <br>
+    </div>
+    <hr>
+    <div class="text-center">
+        <a href="#">
+            <img src="https://i.pinimg.com/564x/10/5d/aa/105daaffcca725ada2d45f5044ad58f1.jpg" height="200"
+                 style="border-radius: 5%; border: 1px solid black; margin-right: 20px;">
+        </a>
+        <a href="#">
+            <img src="https://i.pinimg.com/564x/35/64/bb/3564bbeff860bfbb10583c8abe0ce75d.jpg" height="200"
+                 style="border-radius: 5%; border: 1px solid black;">
+        </a>
+    </div>
+
+</div>
+<style>
+    .modal-body {
+    text-align: left; /* Це правило прибере центрування тексту */
+}
+</style>
+{% endblock %}
