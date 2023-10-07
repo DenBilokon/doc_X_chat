@@ -116,7 +116,8 @@
                        aria-haspopup="true" aria-expanded="false">
                         {{ user.username }}
                         {% if avatar_url %}
-                        <img src="{{ avatar_url }}" alt="Avatar" height="50" style="border-radius: 20%; border: 1px solid black;" >
+                        <img src="{{ avatar_url }}" alt="Avatar" height="50"
+                             style="border-radius: 20%; border: 1px solid black;">
                         {% else %}
                         <img src="https://i.pinimg.com/564x/a5/82/9a/a5829ac0d2b9d70943c41c6f48e5acea.jpg"
                              alt="Placeholder" height="40" style="border-radius: 50%;">
@@ -125,11 +126,11 @@
                     <div class="dropdown-menu" style="transform: translateX(-20px);">
                         <a class="dropdown-item" href="/users/profile">Profile</a>
                         <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/users/user_plan_subscription">Change Plan</a>
+                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/users/logout">Logout</a>
                     </div>
                 </li>
-
-
                 {% else %}
                 <li class="nav-item">
                     <a class="btn btn-outline-secondary" href="/users/signup">Sign up</a>
@@ -153,11 +154,11 @@
     {% block content %} {% endblock %}
     <footer class="footer fixed-bottom">
         <div class="container">
-<!--                        <div class="social mb-1">-->
-<!--                            <a href="https://github.com/DenBilokon/doc_X_chat" target="_blank"-->
-<!--                               rel="noopener noreferre">-->
-<!--                                <img src="https://s.dou.ua/assets/img/github.svg" width="25" height="25"></a>-->
-<!--                        </div>-->
+            <!--                        <div class="social mb-1">-->
+            <!--                            <a href="https://github.com/DenBilokon/doc_X_chat" target="_blank"-->
+            <!--                               rel="noopener noreferre">-->
+            <!--                                <img src="https://s.dou.ua/assets/img/github.svg" width="25" height="25"></a>-->
+            <!--                        </div>-->
             <div class="fs-5 text-center">
                 <span class="big-text" style="font-size: 2em;">X</span> <span class="small-text"
                                                                               style="font-size: 1em;">TEAM &copy; 2023</span>

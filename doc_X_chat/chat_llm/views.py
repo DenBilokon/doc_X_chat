@@ -22,12 +22,13 @@ from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
 
 
-
 load_dotenv()
+
 
 def main(request):
     # avatar = Avatar.objects.filter(user_id=request.user.id).first()
     return render(request, 'chat_llm/index.html', context={})
+
 
 def get_pdf_text(pdf):
     """
@@ -36,6 +37,7 @@ def get_pdf_text(pdf):
     :param pdf: PDF file.
     :return: Extracted text from the PDF.
     """
+    text = None
     if pdf:
         pdf_reader = PdfReader(pdf)
         text = ''.join(page.extract_text() for page in pdf_reader.pages)
@@ -141,7 +143,7 @@ def ask_question(request):
     :param request: HTTP request.
     :return: Rendered page with the response.
     """
-    
+
     chat_history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')  # Retrieve chat history for the logged-in user
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
@@ -165,7 +167,7 @@ def ask_question(request):
 
     context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question}
 
-    return render(request, 'ask_question.html', {'user_pdfs': user_pdfs, **context})
+    return render(request, 'chat_base.html', {'user_pdfs': user_pdfs, **context})
 
 
 @login_required(login_url="/login/")
