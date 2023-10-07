@@ -37,3 +37,43 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.user.username} at {self.timestamp}: Q: {self.question}, A: {self.answer}"
+
+
+class UserData(models.Model):
+    SUBSCRIPTION_CHOICES = (
+        ('free', 'Free'),
+        ('gold', 'Gold'),
+        ('ultra', 'Ultra'),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subscribe_plan = models.CharField(max_length=10, choices=SUBSCRIPTION_CHOICES, default='free')
+    total_files_uploaded = models.IntegerField(default=0)
+    total_questions_asked = models.IntegerField(default=0)
+
+    # Обмеження для плану "Free"
+    max_files_allowed_free = 5
+    max_questions_allowed_free = 20
+
+    # Обмеження для плану "Gold"
+    max_files_allowed_gold = 50
+    max_questions_allowed_gold = 200
+
+    # Обмеження для плану "Ultra"
+    max_files_allowed_ultra = 500
+    max_questions_allowed_ultra = 2000
+
+    def max_files_allowed_for_plan(self):
+        if self.subscribe_plan == 'free':
+            return self.max_files_allowed_free
+        elif self.subscribe_plan == 'gold':
+            return self.max_files_allowed_gold
+        elif self.subscribe_plan == 'ultra':
+            return self.max_files_allowed_ultra
+
+    def max_questions_allowed_for_plan(self):
+        if self.subscribe_plan == 'free':
+            return self.max_questions_allowed_free
+        elif self.subscribe_plan == 'gold':
+            return self.max_questions_allowed_gold
+        elif self.subscribe_plan == 'ultra':
+            return self.max_questions_allowed_ultra
