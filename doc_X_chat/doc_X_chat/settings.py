@@ -128,7 +128,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',  # Авторизація через django-allauth
 )
 
-SITE_ID = 5
+SITE_ID = 7
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
@@ -171,6 +171,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+
 
 STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = '/'
