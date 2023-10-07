@@ -159,7 +159,7 @@ def ask_question(request):
 
     context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question}
 
-    return render(request, 'ask_question.html', {'user_pdfs': user_pdfs, **context})
+    return render(request, 'chat_base.html', {'user_pdfs': user_pdfs, **context})
 
 
 def process_user_question(pdf, user_question):
