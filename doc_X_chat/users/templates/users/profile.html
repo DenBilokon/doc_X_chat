@@ -70,6 +70,15 @@
         </div>
     </div>
 </div>
+<script>
+    // повідомлення зникає через 5 сек
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000); // 5000 мілісекунд = 5 секунд
+</script>
 <style>
     .bg-image-link {
         display: block;
@@ -131,14 +140,5 @@
 }
 
 </style>
-<script>
-    // повідомлення про помилку зникає через 5 сек
-    setTimeout(function(){
-        var alerts = document.querySelectorAll(".alert");
-        alerts.forEach(function(alert){
-            alert.style.display = "none";
-        });
-    }, 5000); // 5000 мілісекунд = 5 секунд
-</script>
 
 {% endblock %}

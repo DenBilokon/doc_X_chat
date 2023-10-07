@@ -6,17 +6,17 @@
 <br>
 <div class="text-center">
 
-    <!-- Повідомлення та помилки -->
-        {% if form.errors %}
-        <div class="alert alert-danger" role="alert">
-            {{form.non_field_errors}}
-            {{form.username.errors}}
-            {{form.password.errors}}
-        </div>
-        {% endif %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-        {% endfor %}
+    <!-- Повідомлення та помилки оптимізований варіант-->
+    {% if form.errors %}
+    {% for field, errors in form.errors.items %}
+    {% for error in errors %}
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endfor %}
+    {% endfor %}
+    {% endif %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
 
     <div class="form-box">
         <a href="/" class="bg-image-link"></a>
@@ -31,6 +31,16 @@
         </form>
     </div>
 </div>
+
+<script>
+    // повідомлення зникає через 5 сек
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000);
+</script>
 
 <style>
     .bg-image-link {
@@ -67,14 +77,4 @@
 
 </style>
 
-{% if form.errors or messages %}
-<script>
-    setTimeout(function(){
-        var alerts = document.querySelectorAll(".alert");
-        alerts.forEach(function(alert){
-            alert.style.display = "none";
-        });
-    }, 5000);
-</script>
-{% endif %}
 {% endblock %}
