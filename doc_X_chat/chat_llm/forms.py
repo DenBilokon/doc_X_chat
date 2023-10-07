@@ -1,7 +1,6 @@
 from django import forms
-from .models import PDFDocument, ChatMessage
+from .models import PDFDocument, ChatMessage, CustomProfile
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomProfile
 
 
 class RegistrationForm(forms.ModelForm):
