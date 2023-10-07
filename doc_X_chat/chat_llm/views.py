@@ -17,9 +17,9 @@ from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
-from .models import ChatMessage, PDFDocument
+from .models import ChatMessage, PDFDocument, UserData
 
 
 
@@ -37,7 +37,7 @@ def get_pdf_text(pdf):
     :return: Extracted text from the PDF.
     """
     if pdf:
-        pdf_reader = PdfFileReader(pdf)
+        pdf_reader = PdfReader(pdf)
         text = ''.join(page.extract_text() for page in pdf_reader.pages)
     return text
 
@@ -91,20 +91,46 @@ def upload_pdf(request):
     :param request: HTTP request.
     :return: JSON response.
     """
+    user = request.user
+
+    try:
+        user_data = UserData.objects.get(user=user)
+    except UserData.DoesNotExist:
+        # Обробка ситуації, коли відсутній запис UserData для користувача.
+        # Можна створити запис за замовчуванням тут.
+        user_data = UserData.objects.create(user=user, subscribe_plan='free', total_files_uploaded=0, total_questions_asked=0)
+
+    # Отримати обмеження для користувача залежно від плану підписки
+    max_files_allowed = user_data.max_files_allowed_for_plan()
+
     if request.method == 'POST':
         form = PDFUploadForm(request.POST, request.FILES)
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
-            # Save the PDF document to the database
-            pdf = PDFDocument(user=request.user, title=pdf_document.name)
+
+            # Перевірити, чи користувач перевищив обмеження для завантажених файлів
+            if user_data.total_files_uploaded >= max_files_allowed:
+                return JsonResponse({'error': 'Ви досягли обмеження для завантажених файлів.'}, status=400)
+
+            # Перевірити, чи файл з такою назвою вже існує для цього користувача
+            if PDFDocument.objects.filter(user=user, title=pdf_document.name).exists():
+                return JsonResponse({'error': 'Файл з такою назвою вже існує.'}, status=400)
+
+            # Збільшити кількість завантажених файлів користувача
+            user_data.total_files_uploaded += 1
+            user_data.save()
+
+            # Зберегти PDF-документ у базі даних
+            pdf = PDFDocument(user=user, title=pdf_document.name)
             pdf.documentContent = get_pdf_text(pdf_document)
             pdf.save()
-            return JsonResponse({'message': 'PDF uploaded successfully.'}, status=200)
-        else:
-            return JsonResponse({'error': 'Invalid form data.'}, status=400)
+
     else:
         form = PDFUploadForm()
-    return render(request, 'ask_question.html', {'form': form})
+    user_pdfs = PDFDocument.objects.filter(user=request.user)
+    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
+
+
 
 
 @login_required(login_url="/login/")

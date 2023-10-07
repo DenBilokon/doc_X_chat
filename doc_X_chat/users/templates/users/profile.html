@@ -6,11 +6,25 @@
 <br>
 <div class="container">
     <div class="text-center">
+
+        <!-- Повідомлення та помилки -->
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{form.non_field_errors}}
+            {{form.username.errors}}
+            {{form.password.errors}}
+        </div>
+        {% endif %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
+
         <div class="form-box">
             <a href="/" class="bg-image-link"></a>
             <h4 class="titleForm">PROFILE</h4>
             {% if avatar %}
-            <img src="{{ avatar.image.url }}" alt="User Avatar" height="200" style="border-radius: 20%; border: 1px solid black;">
+            <img src="{{ avatar.image.url }}" alt="User Avatar" height="200"
+                 style="border-radius: 20%; border: 1px solid black;">
 
             {% else %}
             <img src="https://i.pinimg.com/564x/a5/82/9a/a5829ac0d2b9d70943c41c6f48e5acea.jpg" alt="Placeholder"
@@ -25,27 +39,46 @@
                 </button>
             </form>
             <br>
-            <div class="profile-details">
-                <div class="profile-row table-light">
-                    <span class="profile-value">Username:</span>
-                    <span class="profile-label">{{ user.username }}</span>
+            <form action="{% url 'users:update_user' %}" method="post">
+                {% csrf_token %}
+                <div class="profile-details">
+                    <div class="profile-row table-light">
+                        <span class="profile-value">Username:</span>
+                        <input type="text" name="username" value="{{ user.username }}" class="profile-input"/>
+                    </div>
+                    <div class="profile-row table-light">
+                        <span class="profile-value">First Name:</span>
+                        <input type="text" name="first_name" value="{{ user.first_name }}" class="profile-input"/>
+                    </div>
+                    <div class="profile-row table-light">
+                        <span class="profile-value">Last Name:</span>
+                        <input type="text" name="last_name" value="{{ user.last_name }}" class="profile-input"/>
+                    </div>
+                    <div class="profile-row table-light">
+                        <span class="profile-value">Email:</span>
+                        <input type="email" name="email" value="{{ user.email }}" class="profile-input" disabled/>
+                        <!-- Якщо ви не хочете дозволити зміни email -->
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        Update Profile
+                        <input type="file" name="image" style="display: none;">
+                    </button>
+
                 </div>
-                <div class="profile-row table-light">
-                    <span class="profile-value">First Name:</span>
-                    <span class="profile-label">{{ user.first_name }}</span>
-                </div>
-                <div class="profile-row table-light">
-                    <span class="profile-value">Last Name:</span>
-                    <span class="profile-label">{{ user.last_name }}</span>
-                </div>
-                <div class="profile-row table-light">
-                    <span class="profile-value">Email:</span>
-                    <span class="profile-label">{{ user.email }}</span>
-                </div>
-            </div>
+            </form>
+
         </div>
     </div>
 </div>
+<script>
+    // повідомлення зникає через 5 сек
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000); // 5000 мілісекунд = 5 секунд
+</script>
 <style>
     .bg-image-link {
         display: block;
@@ -96,5 +129,16 @@
     font-weight: normal;
 }
 
+    .profile-input {
+    border: none;
+    background-color: transparent;
+    outline: none;
+    font-weight: bold;
+}
+.profile-input:focus {
+    border-bottom: 1px solid black;
+}
+
 </style>
+
 {% endblock %}

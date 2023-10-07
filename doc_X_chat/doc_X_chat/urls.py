@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from admin_console.views import get_all_users_data
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include('chat_llm.urls')),
     path('users/', include('users.urls')),
     path('accounts/', include('allauth.urls')),
     path('chat_llm/', include('chat_llm.urls')),
+    path('users_data/', get_all_users_data, name='users_data'),
 ]
