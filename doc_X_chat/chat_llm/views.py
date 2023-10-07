@@ -1,4 +1,3 @@
-
 # import fitz  # PyMuPDF
 import os
 from django.contrib import messages
@@ -20,7 +19,6 @@ from langchain.memory import ConversationBufferMemory
 from PyPDF2 import PdfReader
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
-
 
 load_dotenv()
 
@@ -100,7 +98,8 @@ def upload_pdf(request):
     except UserData.DoesNotExist:
         # Обробка ситуації, коли відсутній запис UserData для користувача.
         # Можна створити запис за замовчуванням тут.
-        user_data = UserData.objects.create(user=user, subscribe_plan='free', total_files_uploaded=0, total_questions_asked=0)
+        user_data = UserData.objects.create(user=user, subscribe_plan='free', total_files_uploaded=0,
+                                            total_questions_asked=0)
 
     # Отримати обмеження для користувача залежно від плану підписки
     max_files_allowed = user_data.max_files_allowed_for_plan()
@@ -130,9 +129,8 @@ def upload_pdf(request):
     else:
         form = PDFUploadForm()
     user_pdfs = PDFDocument.objects.filter(user=request.user)
+    # file_context = ask_question(request)
     return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
-
-
 
 
 @login_required(login_url="/login/")
@@ -144,14 +142,17 @@ def ask_question(request):
     :return: Rendered page with the response.
     """
 
-    chat_history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')  # Retrieve chat history for the logged-in user
+    chat_history = ChatMessage.objects.filter(user=request.user).order_by(
+        'timestamp')  # Retrieve chat history for the logged-in user
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     user_question = ""
 
     if request.method == 'POST':
         user_question = request.POST.get('user_question')
+        print(f'user question:  {user_question}')
         selected_pdf_id = request.POST.get('selected_pdf')
+        print(f'selected_pdf_id:  {selected_pdf_id}')
         selected_pdf = get_object_or_404(PDFDocument, id=selected_pdf_id)
         text_chunks = get_text_chunks(selected_pdf.documentContent)
 
@@ -159,15 +160,20 @@ def ask_question(request):
         conversation_chain = get_conversation_chain(knowledge_base)
 
         with get_openai_callback() as cb:
-            response = conversation_chain.get_response(user_question)
+            # print(f'cd: {cb}')
+            response = conversation_chain({'question': user_question})
+            print(f'response: {response}')
+            # response = cb.complete(response)
 
-        chat_response = response
+        chat_response = response["answer"]
+        print(f'chat_response: {chat_response}')
         chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response)
         chat_message.save()
+    user_pdfs = PDFDocument.objects.filter(user=request.user)
+    context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question,
+               'user_pdfs': user_pdfs, 'timestamp': chat_message.timestamp}
 
-    context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question}
-
-    return render(request, 'chat_base.html', {'user_pdfs': user_pdfs, **context})
+    return render(request, 'chat_llm/chat_base.html', context)
 
 
 @login_required(login_url="/login/")
@@ -242,4 +248,3 @@ def update_pdf(request, pdf_id):
     else:
         form = PDFUpdateForm(instance=pdf)
     return render(request, 'update_pdf.html', {'form': form, 'pdf': pdf})
-
