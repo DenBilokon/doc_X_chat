@@ -131,7 +131,7 @@ def ask_question(request):
     :param request: HTTP request.
     :return: Rendered page with the response.
     """
-    
+
     chat_history = ChatMessage.objects.filter(user=request.user).order_by('timestamp')  # Retrieve chat history for the logged-in user
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
