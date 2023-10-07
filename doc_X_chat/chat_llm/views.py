@@ -112,24 +112,24 @@ def upload_pdf(request):
             if user_data.total_files_uploaded >= max_files_allowed:
                 return JsonResponse({'error': 'Ви досягли обмеження для завантажених файлів.'}, status=400)
 
-            # Збільшити кількість завантажених файлів користувача
+            # Перевірити, чи файл з такою назвою вже існує для цього користувача
+            if PDFDocument.objects.filter(user=user, title=pdf_document.name).exists():
+                return JsonResponse({'error': 'Файл з такою назвою вже існує.'}, status=400)
 
+            # Збільшити кількість завантажених файлів користувача
+            user_data.total_files_uploaded += 1
+            user_data.save()
 
             # Зберегти PDF-документ у базі даних
             pdf = PDFDocument(user=user, title=pdf_document.name)
             pdf.documentContent = get_pdf_text(pdf_document)
             pdf.save()
 
-            user_data.total_files_uploaded += 1
-            user_data.save()
-            #
-            # return JsonResponse({'message': 'PDF uploaded successfully.'}, status=200)
-        # else:
-            # return JsonResponse({'error': 'Недійсні дані форми.'}, status=400)
     else:
         form = PDFUploadForm()
-        user_pdfs = PDFDocument.objects.filter(user=request.user)
+    user_pdfs = PDFDocument.objects.filter(user=request.user)
     return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
+
 
 
 

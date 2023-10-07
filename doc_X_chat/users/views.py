@@ -11,7 +11,6 @@ from cloudinary.exceptions import Error as CloudinaryError
 from .forms import RegisterForm, AvatarForm, UpdateUserForm
 from .models import Avatar
 
-
 class RegisterView(View):
     form_class = RegisterForm
     template_name = 'users/signup.html'
@@ -103,3 +102,5 @@ def upload_avatar(request):
 def signup_redirect(request):
     messages.error(request, "Something wrong here, it may be that you already have account!")
     return redirect(to='chat_llm:home')
+
+

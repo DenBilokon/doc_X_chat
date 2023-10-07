@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     "chat_llm",
     "users",
+    "admin_console",
 ]
 
 MIDDLEWARE = [
