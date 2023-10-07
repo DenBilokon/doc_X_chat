@@ -22,3 +22,4 @@ class Avatar(models.Model):
     image = CloudinaryField(resource_type='auto', allowed_formats=EXTENSIONS_IMG, folder='avatars doc_X_chat')
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+

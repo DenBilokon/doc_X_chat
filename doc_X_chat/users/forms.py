@@ -26,6 +26,8 @@ class RegisterForm(UserCreationForm):
                                 widget=forms.PasswordInput({'class': 'form-control',
                                                             'placeholder': 'password2'}))
 
+
+
     class Meta:
         model = User
         fields = ["username", "first_name", "last_name", "email", "password1", "password2"]
