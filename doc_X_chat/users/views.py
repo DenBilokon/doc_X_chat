@@ -8,8 +8,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from cloudinary.exceptions import Error as CloudinaryError
 
-from .forms import RegisterForm, AvatarForm
+from .forms import RegisterForm, AvatarForm, UpdateUserForm
 from .models import Avatar
+from chat_llm.models import UserData
 
 
 class RegisterView(View):
@@ -18,7 +19,7 @@ class RegisterView(View):
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect(to='quotes:home')
+            return redirect(to='chat_llm:home')
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
@@ -30,7 +31,7 @@ class RegisterView(View):
             form.save()
             username = form.cleaned_data['username']
             messages.success(request, f"Hello {username}! Your account has been created.")
-            return redirect(to="users:login")
+            return redirect(to="users/signin.html")
         return render(request, self.template_name, {'form': form})
 
 
@@ -50,8 +51,24 @@ def profile(request):
     """
     user = request.user
     user_id = request.user.id
+    user_plan = UserData.objects.get(user=user)
     avatar = Avatar.objects.filter(user_id=user_id).first()
-    return render(request, 'users/profile.html', context={'users': user, 'avatar': avatar})
+    return render(request, 'users/profile.html',
+                  context={'users': user, 'avatar': avatar, 'user_plan': user_plan})
+
+
+@login_required
+def update_user(request):
+    if request.method == 'POST':
+        form = UpdateUserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated!")
+            return redirect('users:profile')
+    else:
+        form = UpdateUserForm(instance=request.user)
+
+    return render(request, 'users/profile.html', {'form': form})
 
 
 @login_required
@@ -88,4 +105,12 @@ def upload_avatar(request):
 
 def signup_redirect(request):
     messages.error(request, "Something wrong here, it may be that you already have account!")
-    return redirect(to='quotes:home')
+    return redirect(to='chat_llm:home')
+
+
+def user_plan_subscription(request):
+
+    user = request.user
+    user_plan = UserData.objects.get(user=user)
+    return render(request, 'users/user_plan_subscription.html',
+                  context={'users': user, 'user_plan': user_plan})
