@@ -61,9 +61,7 @@ def get_vectorstore(text_chunks):
     :param text_chunks: List of text chunks.
     :return: Knowledge base vector store.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
-    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=api_key)
-
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
     knowledge_base = FAISS.from_texts(text_chunks, embeddings)
     return knowledge_base
 
@@ -131,9 +129,11 @@ def upload_pdf(request):
     else:
         form = PDFUploadForm()
     user_pdfs = PDFDocument.objects.filter(user=request.user)
-
     chat_message = ChatMessage.objects.all()
     return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs, 'chat_message': chat_message})
+
+
+
 
 
 @login_required(login_url="/login/")
@@ -145,13 +145,12 @@ def ask_question(request):
     :return: Rendered page with the response.
     """
 
-    # chat_history = ChatMessage.objects.filter(user=request.user).order_by(
-    #     'timestamp')[:3]  # Retrieve chat history for the logged-in user
     chat_history = ChatMessage.objects.filter(user=request.user).order_by(
         'timestamp')[:10]
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     user_question = ""
+    selected_pdf = None  # Змінено з selected_pdf_id на об'єкт PDFDocument
 
     if request.method == 'POST':
         user_question = request.POST.get('user_question')
@@ -165,26 +164,25 @@ def ask_question(request):
         conversation_chain = get_conversation_chain(knowledge_base)
 
         with get_openai_callback() as cb:
-            # print(f'cd: {cb}')
             response = conversation_chain({'question': user_question})
             print(f'response: {response}')
-            # response = cb.complete(response)
 
         chat_response = response["answer"]
         print(f'chat_response: {chat_response}')
-        chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response)
+        chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
+                                   pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
 
         chat_message.save()
-    # chat_history = ChatMessage.objects.filter(user=request.user).order_by(
-    #     'timestamp')[:10]
 
     user_pdfs = PDFDocument.objects.filter(user=request.user)
-    chat_message = ChatMessage.objects.all()
+
+    # Отримуємо повідомлення, які відносяться до обраного PDFDocument
+    chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by('timestamp')
+
     context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question,
                'user_pdfs': user_pdfs, 'chat_message': chat_message}
 
     return render(request, 'chat_llm/chat_base.html', context)
-    #return redirect(to='chat_llm:main')
 
 
 @login_required(login_url="/login/")
