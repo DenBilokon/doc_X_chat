@@ -61,7 +61,9 @@ def get_vectorstore(text_chunks):
     :param text_chunks: List of text chunks.
     :return: Knowledge base vector store.
     """
-    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+    api_key = os.getenv("OPENAI_API_KEY")
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=api_key)
+
     knowledge_base = FAISS.from_texts(text_chunks, embeddings)
     return knowledge_base
 
@@ -109,13 +111,13 @@ def upload_pdf(request):
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
 
-            # Перевірити, чи користувач перевищив обмеження для завантажених файлів
             if user_data.total_files_uploaded >= max_files_allowed:
-                return JsonResponse({'error': 'Ви досягли обмеження для завантажених файлів.'}, status=400)
+                messages.error(request, 'Ви досягли обмеження для завантажених файлів.')
+                return redirect('upload_pdf')
 
-            # Перевірити, чи файл з такою назвою вже існує для цього користувача
             if PDFDocument.objects.filter(user=user, title=pdf_document.name).exists():
-                return JsonResponse({'error': 'Файл з такою назвою вже існує.'}, status=400)
+                messages.error(request, 'Файл з такою назвою вже існує.')
+                return redirect('upload_pdf')
 
             # Збільшити кількість завантажених файлів користувача
             user_data.total_files_uploaded += 1
