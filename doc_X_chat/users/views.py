@@ -10,7 +10,7 @@ from .forms import RegisterForm, AvatarForm, UpdateUserForm
 from .models import Avatar
 from chat_llm.models import UserData
 
-from django.contrib.sites.shortcuts import get_current_site
+
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -39,6 +39,15 @@ class RegisterView(View):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
+            password1 = form.cleaned_data.get('password1')
+
+            if len(username) < 5:
+                form.add_error('username', ValidationError("Username must be at least 5 characters long."))
+            if len(password1) < 8:
+                form.add_error('password1', ValidationError("Password must be at least 8 characters long."))
+
+            if form.errors:
+                return render(request, self.template_name, {'form': form})
 
             # Check if a user with this username already exists
             if get_user_model().objects.filter(username=username).exists():
