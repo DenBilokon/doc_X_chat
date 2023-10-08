@@ -131,6 +131,7 @@ def upload_pdf(request):
     else:
         form = PDFUploadForm()
     user_pdfs = PDFDocument.objects.filter(user=request.user)
+
     chat_message = ChatMessage.objects.all()
     return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs, 'chat_message': chat_message})
 
@@ -183,6 +184,7 @@ def ask_question(request):
                'user_pdfs': user_pdfs, 'chat_message': chat_message}
 
     return render(request, 'chat_llm/chat_base.html', context)
+    #return redirect(to='chat_llm:main')
 
 
 @login_required(login_url="/login/")

@@ -1,4 +1,6 @@
 from django import forms
+from django.forms import SelectDateWidget, FileInput, FileField
+
 from .models import PDFDocument, ChatMessage, CustomProfile
 from django.contrib.auth.forms import UserCreationForm
 
@@ -67,7 +69,7 @@ class PDFUploadForm(forms.Form):
     Allows users to upload a PDF document.
     :param forms.Form: Form for uploading a PDF document.
     """
-    pdf_document = forms.FileField(label='Upload a PDF', required=True)
+    pdf_document = forms.FileField(label='Upload a PDF', required=True, widget=FileInput({'class': "form-control"}))
 
 
 class UserQuestionForm(forms.Form):
