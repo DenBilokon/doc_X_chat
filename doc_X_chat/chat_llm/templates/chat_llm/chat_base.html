@@ -14,7 +14,6 @@
         {{form.password.errors}}
     </div>
     {% endif %}
-
     {% for message in messages %}
     <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
     {% endfor %}
@@ -45,79 +44,65 @@
             </select>
         </div>
     </div>
+    <hr>
+    <h4 class="text-center" style="color: white;">Select a PDF</h4>
+    <div class="text">
+        {% for pdf in user_pdfs %}
+        <h6 style="color: white;">{{ pdf.title }}</h6>
+        {% endfor %}
+    </div>
 </div>
+
+
 <div class="container">
     <div id="main">
-        <h2>Chat</h2>
-        <ul>
-            <li>
-                <br>
-                Question: {{ user_question }}<br>
-                Answer: {{ chat_response }}<br>
-                Date: {{ timestamp }}
-            </li>
-        </ul>
+        <div class="chat-history-container" id="chat-history-container">
+            <div class="chat-history">
+                <ul>
+                    {% for message in chat_message %}
+                    <li>
+                        <center><small>{{ message.timestamp }}</small></center>
+                        <br>
+                        <strong>You:</strong> {{ message.message }}<br><br>
+                        <strong>Bot:</strong> {{ message.answer }}<br>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br><br>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="form-box">
+                        <h3 align="center">Ask Question About Your PDF File</h3>
+                        <form action="{% url 'ask_question' %}" method="post" class="form-inline">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <label for="textInput" class="col-md-3 col-form-label mt-4"></label>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="textInput" class="form-label mt-4">Enter Text:</label>
+                                        <input class="form-control" type="text" id="textInput" name="user_question">
+                                        <!-- Цей прихований елемент буде використовуватися для передачі вибраного PDF -->
+                                        <input type="hidden" name="selected_pdf" id="main_selected_pdf">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="image"
+                                           src="https://i.pinimg.com/originals/60/b6/40/60b6403f7192e21afc0f3194b92df572.jpg"
 
-        <h1>Ask a Question</h1>
-        <div class="form-box">
-            <form action="{% url 'ask_question' %}" method="post">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="textInput" class="form-label mt-4">Enter Text:</label>
-                    <input class="form-control" type="text" id="textInput" name="user_question">
-                    <!-- Цей прихований елемент буде використовуватися для передачі вибраного PDF -->
-                    <input type="hidden" name="selected_pdf" id="main_selected_pdf">
+                                           alt="Submit" style="width: 50px; height: 50px; border-radius: 50%;">
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">ASK</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-</div>
-
-
-<style>
-    /* Add this style block within your HTML file or in your CSS file */
-    #selected_pdf {
-        width: 100%; /* Adjust the percentage value as needed */
-    }
-
-    .fixed-bottom {
-        /* Опціонально: стиль для фіксованого блоку внизу */
-        background-color: #f5f5f5; /* Задайте бажаний фон */
-        padding: 10px; /* Опціонально: встановіть відступи */
-    }
-
-    .chat-history-container {
-        max-height: 300px; /* Встановіть максимальну висоту для контейнера історії чату */
-        overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
-        border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
-        padding: 10px; /* Опціонально: додайте відступ для відокремлення */
-        background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
-        background-size: cover; /* Опціонально: встановіть розмір фону */
-        z-index: 0;
-    }
-
-    .chat-history ul {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    .chat-history li {
-        margin-bottom: 10px;
-    }
-</style>
-
-<script>
-    // Отримуємо посилання на елемент контейнера
-    var chatHistoryContainer = document.getElementById("chat-history-container");
-
-    // Прокручуємо контейнер до нижнього краю
-    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
-</script>
-
-
-
 <!-- JavaScript goes at the end -->
 <script>
     function submitForm() {
@@ -194,4 +179,46 @@ function triggerFileSelect() {
 }
 
 </style>
+
+<style>
+    /* Add this style block within your HTML file or in your CSS file */
+    #selected_pdf {
+        width: 100%; /* Adjust the percentage value as needed */
+    }
+
+    .fixed-bottom {
+        /* Опціонально: стиль для фіксованого блоку внизу */
+        background-color: #f5f5f5; /* Задайте бажаний фон */
+        padding: 10px; /* Опціонально: встановіть відступи */
+    }
+
+    .chat-history-container {
+        max-height: 300px; /* Встановіть максимальну висоту для контейнера історії чату */
+        overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
+        border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
+        padding: 10px; /* Опціонально: додайте відступ для відокремлення */
+        background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
+        background-size: cover; /* Опціонально: встановіть розмір фону */
+        z-index: 0;
+    }
+
+    .chat-history ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .chat-history li {
+        margin-bottom: 10px;
+    }
+</style>
+
+<script>
+    // Отримуємо посилання на елемент контейнера
+    var chatHistoryContainer = document.getElementById("chat-history-container");
+
+    // Прокручуємо контейнер до нижнього краю
+    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+</script>
+
 {% endblock %}
+
