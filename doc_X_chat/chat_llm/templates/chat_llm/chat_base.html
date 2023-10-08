@@ -5,6 +5,8 @@
 
 <span style="font-size:30px;cursor:pointer" onclick="toggleNav()">&#9776; Menu</span>
 
+{% with selected_pdf_id=request.POST.selected_pdf|default:"" %} <!-- додаємо цей рядок тут -->
+
 <div id="mySidenav" class="sidenav">
     <!-- Повідомлення та помилки -->
     {% if form.errors %}
@@ -19,36 +21,36 @@
     {% endfor %}
     <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
     <div class="text-center">
-        <h4 style="color: white;">Upload new PDF</h4>
+        <label style="color: white;" for="uploadForm" class="form-label mt-4">Update file:</label>
         <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}" id="uploadForm">
             {% csrf_token %}
-
             <!-- Невидимий input для завантаження файлу -->
             <input type="file" name="{{ form.pdf_document.name }}" id="{{ form.pdf_document.auto_id }}"
                    onchange="submitForm();" style="display: none;">
-
             <!-- Зображення-кнопка -->
             <img src="{% static 'chat_llm/img/upload_file.png' %}" height="50" alt="Upload Image" id="uploadImage"
                  onclick="triggerFileSelect();" style="cursor: pointer;">
-
         </form>
-
-        <hr>
-        <h4 style="color: white;">Select a PDF</h4>
         <div class="form-group">
-            <label for="sidenav_selected_pdf">Select a PDF:</label>
-            <select class="form-control" id="sidenav_selected_pdf" required>
+            <label style="color: white;" for="sidenav_selected_pdf" class="form-label mt-4">Select file:</label>
+            <select class="form-select" id="sidenav_selected_pdf">
                 {% for pdf in user_pdfs %}
-                <option value="{{ pdf.id }}">{{ pdf.title }}</option>
+                <option value="{{ pdf.id }}"
+                        {% if pdf.id|stringformat:"s" == selected_pdf_id %}
+                        selected
+                        {% endif %}
+                >{{ pdf.title }}</option>
                 {% endfor %}
             </select>
         </div>
     </div>
-    <hr>
-    <h4 class="text-center" style="color: white;">Select a PDF</h4>
+    <hr style="color: white;">
+    <h6 class="text-center" style="color: white;">Files:</h6>
     <div class="text">
         {% for pdf in user_pdfs %}
-        <h6 style="color: white;">{{ pdf.title }}</h6>
+        <ul>
+            <li style="color: white;">{{ pdf.title }}</li>
+        </ul>
         {% endfor %}
     </div>
 </div>
@@ -56,6 +58,7 @@
 
 <div class="container">
     <div id="main">
+
         <div class="chat-history-container" id="chat-history-container">
             <div class="chat-history">
                 <ul>
@@ -70,17 +73,17 @@
                 </ul>
             </div>
         </div>
+
         <br><br>
         <div class="container">
             <div class="row">
                 <div class="col-md-10">
                     <div class="form-box">
-                        <h3 align="center">Ask Question About Your PDF File</h3>
                         <form action="{% url 'ask_question' %}" method="post" class="form-inline">
                             {% csrf_token %}
                             <div class="form-group row">
                                 <label for="textInput" class="col-md-3 col-form-label mt-4"></label>
-                                <div class="col-md-6">
+                                <div class="col-md-9">
                                     <div class="form-group">
                                         <label for="textInput" class="form-label mt-4">Enter Text:</label>
                                         <input class="form-control" type="text" id="textInput" name="user_question">
@@ -91,9 +94,7 @@
                                 <div class="col-md-3">
                                     <input type="image"
                                            src="https://i.pinimg.com/originals/60/b6/40/60b6403f7192e21afc0f3194b92df572.jpg"
-
                                            alt="Submit" style="width: 50px; height: 50px; border-radius: 50%;">
-
                                 </div>
                             </div>
                         </form>
@@ -103,11 +104,13 @@
         </div>
     </div>
 </div>
+
 <!-- JavaScript goes at the end -->
 <script>
     function submitForm() {
     document.getElementById("uploadForm").submit();
 }
+
 
 function triggerFileSelect() {
     document.getElementById("{{ form.pdf_document.auto_id }}").click();
@@ -123,10 +126,46 @@ function triggerFileSelect() {
          document.getElementById("main").style.marginLeft= "0";
      }
  }
+
     document.getElementById("textInput").addEventListener("focus", function() {
     var selectedPdfValue = document.getElementById("sidenav_selected_pdf").value;
     document.getElementById("main_selected_pdf").value = selectedPdfValue;
 });
+
+
+document.getElementById("sidenav_selected_pdf").addEventListener("change", function() {
+    let selectedPdf = this.value;
+
+    fetch(`/get_chat_history?pdf_id=${selectedPdf}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const chatHistoryList = document.querySelector(".chat-history ul");
+        chatHistoryList.innerHTML = ""; // Очищуємо поточний список повідомлень
+
+        data.forEach(message => {
+            let messageItem = `
+                <li>
+                    <center><small>${message.timestamp}</small></center>
+                    <br>
+                    <strong>You:</strong> ${message.message}<br><br>
+                    <strong>Bot:</strong> ${message.answer}<br>
+                </li>
+            `;
+            chatHistoryList.innerHTML += messageItem;
+        });
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error.message);
+        // Додайте повідомлення про помилку для користувача, якщо це необхідно.
+        // Наприклад: alert('Sorry, there was a problem loading the chat history.');
+    });
+});
+
 
 </script>
 <script>
@@ -220,5 +259,6 @@ function triggerFileSelect() {
     chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
 </script>
 
-{% endblock %}
+{% endwith %} <!-- закриваємо with блок тут -->
 
+{% endblock %}

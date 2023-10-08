@@ -9,9 +9,12 @@
         <!-- Повідомлення та помилки -->
         {% if form.errors %}
         <div class="alert alert-danger" role="alert">
-            {{form.non_field_errors}}
-            {{form.username.errors}}
-            {{form.password.errors}}
+            <strong>Error:</strong> Please correct the following errors:
+            <ul>
+                {{form.email.errors.as_ul}}
+                {{form.username.errors.as_ul}}
+                {{form.password.errors.as_ul}}
+            </ul>
         </div>
         {% endif %}
         {% for message in messages %}
@@ -57,15 +60,17 @@
 </div>
 <br>
 
-<script>
-    // повідомлення зникає через 5 сек
-    setTimeout(function(){
-        var alerts = document.querySelectorAll(".alert");
-        alerts.forEach(function(alert){
-            alert.style.display = "none";
-        });
-    }, 5000);
-</script>
+<!--<script>-->
+<!--    // повідомлення зникає через 5 сек-->
+<!--    setTimeout(function(){-->
+<!--        var alerts = document.querySelectorAll(".alert");-->
+<!--        alerts.forEach(function(alert){-->
+<!--            alert.style.display = "none";-->
+<!--        });-->
+<!--    }, 5000);-->
+
+
+<!--</script>-->
 
 <style>
     .bg-image-link {
@@ -110,6 +115,8 @@
             padding: 10px;
         }
     }
+
+
 </style>
 
 {% endblock %}

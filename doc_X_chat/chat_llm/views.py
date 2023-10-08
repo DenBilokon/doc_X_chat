@@ -1,22 +1,22 @@
-# import fitz  # PyMuPDF
+import docx2txt
 import os
+import tempfile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from dotenv import load_dotenv
 
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores.faiss import FAISS
 from langchain.chains import ConversationalRetrievalChain
-from langchain.llms.openai import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfFileReader
+from pptx import Presentation
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
 
@@ -28,17 +28,34 @@ def main(request):
     return render(request, 'chat_llm/index.html', context={})
 
 
-def get_pdf_text(pdf):
+def get_pdf_text(file):
     """
-    Retrieves text from a PDF document.
+    Retrieves text from a file.
 
-    :param pdf: PDF file.
-    :return: Extracted text from the PDF.
+    :param file: File object.
+    :return: Extracted text from the file.
     """
     text = None
-    if pdf:
-        pdf_reader = PdfReader(pdf)
-        text = ''.join(page.extract_text() for page in pdf_reader.pages)
+    if file:
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(file.read())
+            temp_file.flush()
+            if file.name.endswith('.pdf'):
+                pdf_reader = PdfFileReader(temp_file.name)
+                text = ''.join(page.extractText() for page in pdf_reader.pages)
+            elif file.name.endswith('.txt'):
+                with open(temp_file.name, 'r') as f:
+                    text = f.read()
+            elif file.name.endswith('.docx'):
+                text = docx2txt.process(temp_file.name)
+            elif file.name.endswith('.pptx'):
+                prs = Presentation(temp_file.name)
+                text_runs = []
+                for slide in prs.slides:
+                    for shape in slide.shapes:
+                        if hasattr(shape, "text"):
+                            text_runs.append(shape.text)
+                text = '\n'.join(text_runs)
     return text
 
 
@@ -49,7 +66,7 @@ def get_text_chunks(text):
     :param text: Input text.
     :return: List of text chunks.
     """
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     chunks = text_splitter.split_text(text)
     return chunks
 
@@ -61,9 +78,11 @@ def get_vectorstore(text_chunks):
     :param text_chunks: List of text chunks.
     :return: Knowledge base vector store.
     """
-    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
-    knowledge_base = FAISS.from_texts(text_chunks, embeddings)
-    return knowledge_base
+    api_key = os.getenv("OPENAI_API_KEY")
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=api_key)
+
+    vectorstore = FAISS.from_texts(text_chunks, embeddings)
+    return vectorstore
 
 
 def get_conversation_chain(vectorstore):
@@ -109,6 +128,9 @@ def upload_pdf(request):
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
 
+            if pdf_document.size > 50 * 1024 * 1024:  # Розмір файлу понад 50 МБ
+                return JsonResponse({'error': 'Розмір файлу перевищує 50 МБ.'}, status=400)
+
             # Перевірити, чи користувач перевищив обмеження для завантажених файлів
             if user_data.total_files_uploaded >= max_files_allowed:
                 return JsonResponse({'error': 'Ви досягли обмеження для завантажених файлів.'}, status=400)
@@ -130,10 +152,7 @@ def upload_pdf(request):
         form = PDFUploadForm()
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     chat_message = ChatMessage.objects.all()
-    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs, 'chat_message': chat_message})
-
-
-
+    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
 
 
 @login_required(login_url="/login/")
@@ -183,6 +202,19 @@ def ask_question(request):
                'user_pdfs': user_pdfs, 'chat_message': chat_message}
 
     return render(request, 'chat_llm/chat_base.html', context)
+
+
+@login_required(login_url="/login/")
+def get_chat_history(request):
+    pdf_id = request.GET.get('pdf_id')
+    if not pdf_id:
+        return JsonResponse({"error": "PDF ID not provided"}, status=400)
+
+    # Тут ви отримуєте історію чату для даного pdf_id
+    # Це припущення, що у вас є модель ChatMessage або щось подібне
+    messages = ChatMessage.objects.filter(pdf_document_id=pdf_id).values('message', 'answer', 'timestamp')
+
+    return JsonResponse(list(messages), safe=False)
 
 
 @login_required(login_url="/login/")
