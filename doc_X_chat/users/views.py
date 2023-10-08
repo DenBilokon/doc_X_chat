@@ -1,6 +1,4 @@
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth.views import PasswordResetView
@@ -11,6 +9,17 @@ from cloudinary.exceptions import Error as CloudinaryError
 from .forms import RegisterForm, AvatarForm, UpdateUserForm
 from .models import Avatar
 from chat_llm.models import UserData
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_str
 
 
 class RegisterView(View):
@@ -28,10 +37,49 @@ class RegisterView(View):
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data['username']
-            messages.success(request, f"Hello {username}! Your account has been created.")
-            return redirect(to="users/signin.html")
+            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
+
+            # Check if a user with this username already exists
+            if get_user_model().objects.filter(username=username).exists():
+                form.add_error('username', ValidationError('This username is already taken.'))
+                return render(request, self.template_name, {'form': form})
+
+            # Check if a user with this email already exists
+            if get_user_model().objects.filter(email=email).exists():
+                form.add_error('email', ValidationError('This email is already in use.'))
+                return render(request, self.template_name, {'form': form})
+
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()  # Зберігаємо користувача у базу даних
+
+            # Generate email confirmation token and url
+            token = default_token_generator.make_token(user)
+
+            # Отримуємо uid після збереження користувача
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            # Get current site domain
+            # !!!!!!!!!!!!!!! додати домен !!!!!!!!!!!!!!!!!!!
+            # domain = get_current_site(request).domain
+
+            # Prepare email text
+            mail_subject = 'Activate your account'
+            message = render_to_string('users/account_activation_email.html', {
+                'user': user,
+                'domain': '127.0.0.1:8000',
+                'uid': uid,
+                'token': token,
+            })
+
+            email = EmailMessage(mail_subject, message, to=[user.email])
+            email.send()
+
+            messages.success(request,
+                             f"Hello {user.username}! Your account has been created. Please check your email to "
+                             f"confirm your account.")
+            return redirect(to="users:login")
         return render(request, self.template_name, {'form': form})
 
 
@@ -109,8 +157,23 @@ def signup_redirect(request):
 
 
 def user_plan_subscription(request):
-
     user = request.user
     user_plan = UserData.objects.get(user=user)
     return render(request, 'users/user_plan_subscription.html',
                   context={'users': user, 'user_plan': user_plan})
+
+
+def activate_account(request, uid, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uid))
+        user = get_user_model().objects.get(pk=uid)
+        if default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return render(request, 'users/account_activation_done.html')
+        else:
+            return render(request, 'users/account_activation_invalid.html')
+    except Exception as ex:
+        pass
+
+    return redirect(to="users:login")
