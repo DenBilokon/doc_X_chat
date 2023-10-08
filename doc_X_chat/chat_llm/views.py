@@ -15,7 +15,7 @@ from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfFileReader
 from pptx import Presentation
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
@@ -41,8 +41,8 @@ def get_pdf_text(file):
             temp_file.write(file.read())
             temp_file.flush()
             if file.name.endswith('.pdf'):
-                pdf_reader = PdfReader(temp_file.name)
-                text = ''.join(page.extract_text() for page in pdf_reader.pages)
+                pdf_reader = PdfFileReader(temp_file.name)
+                text = ''.join(page.extractText() for page in pdf_reader.pages)
             elif file.name.endswith('.txt'):
                 with open(temp_file.name, 'r') as f:
                     text = f.read()
