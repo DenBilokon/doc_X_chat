@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from .models import UserData
 
+
 @receiver(post_save, sender=User)
 def create_user_data(sender, instance, created, **kwargs):
     if created:

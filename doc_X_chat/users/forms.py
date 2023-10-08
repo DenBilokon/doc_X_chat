@@ -62,3 +62,8 @@ class UpdateUserForm(forms.ModelForm):
         model = User
         fields = ["username", "first_name", "last_name"]
 
+
+class UserPlanForm(forms.ModelForm):
+    pass
+
+

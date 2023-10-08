@@ -1,7 +1,12 @@
 {% extends 'chat_llm/base.html' %}
 {% load static %}
 {% block content %}
-<div class="container">
+
+
+<span style="font-size:30px;cursor:pointer" onclick="toggleNav()">&#9776; Menu</span>
+
+<div id="mySidenav" class="sidenav">
+    <!-- Повідомлення та помилки -->
     {% if form.errors %}
     <div class="alert alert-danger" role="alert">
         {{form.non_field_errors}}
@@ -9,41 +14,184 @@
         {{form.password.errors}}
     </div>
     {% endif %}
-    <div class="row">
-        <div class="col-md-3">
-            <h2>File history</h2>
-            <div class="card text-white bg-success mb-4" style="max-width: 20rem;">
-                <div class="card-header">Chat history</div>
-                <div class="card-body">
-                    {% if user_pdfs %}
-                    {% for pdf in user_pdfs %}
-                    <h4 class="card-title" href=#>{{pdf.title }}</h4>
-                    {% endfor %}
-                    {% else %}
-                    <h4 class="card-title" href=#>No chats :(</h4>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="col-md-9">
-            <h2>Upload new PDF</h2>
-            <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Upload</button>
-            </form>
-            <hr>
-            <h2>Chat</h2>
-            <ul>
-                {% for chat_message in chat_history %}
-                <li>
-                    {{ chat_message.user.username }} ({{ chat_message.timestamp }}):<br>
-                    Question: {{ chat_message.message }}<br>
-                    Answer: {{ chat_message.answer }}
-                </li>
+
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
+    <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
+    <div class="text-center">
+        <h4 style="color: white;">Upload new PDF</h4>
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}" id="uploadForm">
+            {% csrf_token %}
+
+            <!-- Невидимий input для завантаження файлу -->
+            <input type="file" name="{{ form.pdf_document.name }}" id="{{ form.pdf_document.auto_id }}"
+                   onchange="submitForm();" style="display: none;">
+
+            <!-- Зображення-кнопка -->
+            <img src="{% static 'chat_llm/img/upload_file.png' %}" height="50" alt="Upload Image" id="uploadImage"
+                 onclick="triggerFileSelect();" style="cursor: pointer;">
+
+        </form>
+
+        <hr>
+        <h4 style="color: white;">Select a PDF</h4>
+        <div class="form-group">
+            <label for="sidenav_selected_pdf">Select a PDF:</label>
+            <select class="form-control" id="sidenav_selected_pdf" required>
+                {% for pdf in user_pdfs %}
+                <option value="{{ pdf.id }}">{{ pdf.title }}</option>
                 {% endfor %}
-            </ul>
+            </select>
         </div>
     </div>
 </div>
+<div class="container">
+    <div id="main">
+        <h2>Chat</h2>
+        <ul>
+            <li>
+                <br>
+                Question: {{ user_question }}<br>
+                Answer: {{ chat_response }}<br>
+                Date: {{ timestamp }}
+            </li>
+        </ul>
+
+        <h1>Ask a Question</h1>
+        <div class="form-box">
+            <form action="{% url 'ask_question' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="textInput" class="form-label mt-4">Enter Text:</label>
+                    <input class="form-control" type="text" id="textInput" name="user_question">
+                    <!-- Цей прихований елемент буде використовуватися для передачі вибраного PDF -->
+                    <input type="hidden" name="selected_pdf" id="main_selected_pdf">
+                </div>
+                <button type="submit" class="btn btn-primary">ASK</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<style>
+    /* Add this style block within your HTML file or in your CSS file */
+    #selected_pdf {
+        width: 100%; /* Adjust the percentage value as needed */
+    }
+
+    .fixed-bottom {
+        /* Опціонально: стиль для фіксованого блоку внизу */
+        background-color: #f5f5f5; /* Задайте бажаний фон */
+        padding: 10px; /* Опціонально: встановіть відступи */
+    }
+
+    .chat-history-container {
+        max-height: 300px; /* Встановіть максимальну висоту для контейнера історії чату */
+        overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
+        border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
+        padding: 10px; /* Опціонально: додайте відступ для відокремлення */
+        background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
+        background-size: cover; /* Опціонально: встановіть розмір фону */
+        z-index: 0;
+    }
+
+    .chat-history ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .chat-history li {
+        margin-bottom: 10px;
+    }
+</style>
+
+<script>
+    // Отримуємо посилання на елемент контейнера
+    var chatHistoryContainer = document.getElementById("chat-history-container");
+
+    // Прокручуємо контейнер до нижнього краю
+    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+</script>
+
+
+
+<!-- JavaScript goes at the end -->
+<script>
+    function submitForm() {
+    document.getElementById("uploadForm").submit();
+}
+
+function triggerFileSelect() {
+    document.getElementById("{{ form.pdf_document.auto_id }}").click();
+}
+
+    function toggleNav() {
+     var sidenav = document.getElementById("mySidenav");
+     if (sidenav.style.width == "0px" || sidenav.style.width == "") {
+         sidenav.style.width = "250px";
+         document.getElementById("main").style.marginLeft = "250px";
+     } else {
+         sidenav.style.width = "0";
+         document.getElementById("main").style.marginLeft= "0";
+     }
+ }
+    document.getElementById("textInput").addEventListener("focus", function() {
+    var selectedPdfValue = document.getElementById("sidenav_selected_pdf").value;
+    document.getElementById("main_selected_pdf").value = selectedPdfValue;
+});
+
+</script>
+<script>
+    // повідомлення зникає через 5 сек
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000);
+</script>
+
+<style>
+    #main {
+    margin-left: 250px; /* Додаємо цей рядок */
+}
+    .sidenav {
+    height: 100%;
+    width: 250px; /* Зміна тут */
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgba(7, 7, 7, 0.9); /* 0.9 - це рівень прозорості */
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+
+.sidenav a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+</style>
 {% endblock %}
