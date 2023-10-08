@@ -1,0 +1,78 @@
+{% extends 'chat_llm/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{form.non_field_errors}}
+        {{form.username.errors}}
+        {{form.password.errors}}
+    </div>
+    {% endif %}
+    <div class="row">
+
+        <div class="col-md-9">
+            <h2>Upload new PDF</h2>
+            <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Upload</button>
+            </form>
+            <hr>
+            <h2>Chat</h2>
+            <ul>
+
+                <li>
+                    <br>
+                    Question: {{ user_question }}<br>
+                    Answer: {{ chat_response }}
+                    Date: {{ timestamp }}
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Ask a Question</h1>
+
+
+
+            <div class="form-box">
+            <form action="{% url 'ask_question' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="textInput" class="form-label mt-4">Enter Text:</label>
+                    <input class="form-control" type="text" id="textInput" name="user_question">
+                </div>
+                <div class="form-group">
+                    <label for="selected_pdf">Select a PDF:</label>
+                    <select class="form-control" id="selected_pdf" name="selected_pdf" required>
+                        {% for pdf in user_pdfs %}
+                            <option value="{{ pdf.id }}">{{ pdf.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                    <br>
+                    <button type="submit" class="btn btn-primary">ASK</button>
+                </form>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}
