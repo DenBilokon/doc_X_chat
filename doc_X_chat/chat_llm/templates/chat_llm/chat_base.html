@@ -58,6 +58,7 @@
 
 <div class="container">
     <div id="main">
+
         <div class="chat-history-container" id="chat-history-container">
             <div class="chat-history">
                 <ul>
@@ -72,6 +73,7 @@
                 </ul>
             </div>
         </div>
+
         <br><br>
         <div class="container">
             <div class="row">
@@ -102,6 +104,7 @@
         </div>
     </div>
 </div>
+
 <!-- JavaScript goes at the end -->
 <script>
     function submitForm() {
@@ -122,10 +125,46 @@ function triggerFileSelect() {
          document.getElementById("main").style.marginLeft= "0";
      }
  }
+
     document.getElementById("textInput").addEventListener("focus", function() {
     var selectedPdfValue = document.getElementById("sidenav_selected_pdf").value;
     document.getElementById("main_selected_pdf").value = selectedPdfValue;
 });
+
+
+document.getElementById("sidenav_selected_pdf").addEventListener("change", function() {
+    let selectedPdf = this.value;
+
+    fetch(`/get_chat_history?pdf_id=${selectedPdf}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const chatHistoryList = document.querySelector(".chat-history ul");
+        chatHistoryList.innerHTML = ""; // Очищуємо поточний список повідомлень
+
+        data.forEach(message => {
+            let messageItem = `
+                <li>
+                    <center><small>${message.timestamp}</small></center>
+                    <br>
+                    <strong>You:</strong> ${message.message}<br><br>
+                    <strong>Bot:</strong> ${message.answer}<br>
+                </li>
+            `;
+            chatHistoryList.innerHTML += messageItem;
+        });
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error.message);
+        // Додайте повідомлення про помилку для користувача, якщо це необхідно.
+        // Наприклад: alert('Sorry, there was a problem loading the chat history.');
+    });
+});
+
 
 </script>
 <script>
