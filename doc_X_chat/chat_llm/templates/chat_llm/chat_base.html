@@ -9,70 +9,99 @@
         {{form.password.errors}}
     </div>
     {% endif %}
-    <div class="row">
+    <div class="form-group">
+        <h2 align="center">Upload Your PDF document</h2>
+        <br>
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <br>
+            <button type="submit" class="btn btn-info">Upload PDF</button>
+        </form>
+    </div>
 
-        <div class="col-md-9">
-            <h2>Upload new PDF</h2>
-            <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Upload</button>
-            </form>
-            <hr>
-            <h2>Chat</h2>
+    <br>
+
+    <div class="chat-history-container">
+        <div class="chat-history">
             <ul>
-
-                <li>
-                    <br>
-                    Question: {{ user_question }}<br>
-                    Answer: {{ chat_response }}
-                    Date: {{ timestamp }}
-                </li>
-
+                {% for message in chat_message %}
+                    <li>
+                        <center><small>{{ message.timestamp }}</small></center><br>
+                        <strong>You:</strong> {{ message.message }}<br><br>
+                        <strong>Bot:</strong> {{ message.answer }}<br>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
     </div>
+
+    <br><br>
 </div>
 
 
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            <h1>Ask a Question</h1>
-
-
-
+        <div class="col-md-10">
             <div class="form-box">
-            <form action="{% url 'ask_question' %}" method="post">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="textInput" class="form-label mt-4">Enter Text:</label>
-                    <input class="form-control" type="text" id="textInput" name="user_question">
-                </div>
-                <div class="form-group">
-                    <label for="selected_pdf">Select a PDF:</label>
-                    <select class="form-control" id="selected_pdf" name="selected_pdf" required>
-                        {% for pdf in user_pdfs %}
-                            <option value="{{ pdf.id }}">{{ pdf.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-
+                <h3 align="center">Ask Question About Your PDF File</h3>
+                <form action="{% url 'ask_question' %}" method="post" class="form-inline">
+                    {% csrf_token %}
+                    <div class="form-group row">
+                        <label for="textInput" class="col-md-3 col-form-label mt-4"></label>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <input class="form-control flex-grow-1" type="text" id="textInput" name="user_question" placeholder="Type Your Question">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="image" src="https://i.pinimg.com/originals/60/b6/40/60b6403f7192e21afc0f3194b92df572.jpg" alt="Submit" style="width: 50px; height: 50px; border-radius: 50%; ;" >
+                        </div>
+                    </div>
                     <br>
-                    <button type="submit" class="btn btn-primary">ASK</button>
-                </form>
-            </div>
-
-
-
-        </div>
+                                    <div class="form-group row">
+<!--                    <label for="selected_pdf" class="col-md-3 col-form-label mt-4 d-flex align-items-center">Select PDF:</label>-->
+                    <div class="col-md-6">
+                        <select class="form-control" id="selected_pdf" name="selected_pdf" required>
+                            {% for pdf in user_pdfs %}
+                <option value="{{ pdf.id }}">{{ pdf.title }}</option>
+            {% endfor %}
+        </select>
     </div>
 </div>
 
 
+<style>
+        /* Add this style block within your HTML file or in your CSS file */
+    #selected_pdf {
+        width: 100%; /* Adjust the percentage value as needed */
+    }
+
+    .fixed-bottom {
+        /* Опціонально: стиль для фіксованого блоку внизу */
+        background-color: #f5f5f5; /* Задайте бажаний фон */
+        padding: 10px; /* Опціонально: встановіть відступи */
+    }
 
 
+    /* Додайте це до вашого CSS файлу або розділу стилів */
+    .chat-history-container {
+    max-height: 300px; /* Встановіть максимальну висоту для контейнера історії чату */
+    overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
+    border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
+    padding: 10px; /* Опціонально: додайте відступ для відокремлення */
+    background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
+    /* background-image: url('your-image-url.jpg'); */ /* Або вставте URL зображення як фон (розкоментуйте цей рядок і замініть 'your-image-url.jpg' на шлях до вашого зображення) */
+    background-size: cover; /* Опціонально: встановіть розмір фону */
+    z-index: 0;
+}
 
+    .chat-history ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .chat-history li {
+        margin-bottom: 10px;
+    }
+</style>
 
 {% endblock %}

@@ -130,7 +130,8 @@ def upload_pdf(request):
         form = PDFUploadForm()
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     # file_context = ask_question(request)
-    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
+    chat_message = ChatMessage.objects.all()
+    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs, 'chat_message': chat_message})
 
 
 @login_required(login_url="/login/")
@@ -142,8 +143,10 @@ def ask_question(request):
     :return: Rendered page with the response.
     """
 
+    # chat_history = ChatMessage.objects.filter(user=request.user).order_by(
+    #     'timestamp')[:3]  # Retrieve chat history for the logged-in user
     chat_history = ChatMessage.objects.filter(user=request.user).order_by(
-        'timestamp')  # Retrieve chat history for the logged-in user
+        'timestamp')[:10]
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     user_question = ""
@@ -168,12 +171,18 @@ def ask_question(request):
         chat_response = response["answer"]
         print(f'chat_response: {chat_response}')
         chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response)
+
         chat_message.save()
+    # chat_history = ChatMessage.objects.filter(user=request.user).order_by(
+    #     'timestamp')[:10]
+
     user_pdfs = PDFDocument.objects.filter(user=request.user)
+    chat_message = ChatMessage.objects.all()
     context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question,
-               'user_pdfs': user_pdfs, 'timestamp': chat_message.timestamp}
+               'user_pdfs': user_pdfs, 'chat_message': chat_message}
 
     return render(request, 'chat_llm/chat_base.html', context)
+    #return redirect(to='chat_llm:main')
 
 
 @login_required(login_url="/login/")
