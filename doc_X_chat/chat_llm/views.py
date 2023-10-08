@@ -3,7 +3,6 @@ import os
 import tempfile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from dotenv import load_dotenv
@@ -57,6 +56,8 @@ def get_pdf_text(file):
                         if hasattr(shape, "text"):
                             text_runs.append(shape.text)
                 text = '\n'.join(text_runs)
+            else:
+                raise ValueError('Unsupported file type')
     return text
 
 
