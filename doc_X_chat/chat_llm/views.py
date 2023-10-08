@@ -3,7 +3,6 @@ import os
 import tempfile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from dotenv import load_dotenv
@@ -16,7 +15,7 @@ from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from pptx import Presentation
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
@@ -42,8 +41,8 @@ def get_pdf_text(file):
             temp_file.write(file.read())
             temp_file.flush()
             if file.name.endswith('.pdf'):
-                pdf_reader = PdfFileReader(temp_file.name)
-                text = ''.join(page.extractText() for page in pdf_reader.pages)
+                pdf_reader = PdfReader(temp_file.name)
+                text = ''.join(page.extract_text() for page in pdf_reader.pages)
             elif file.name.endswith('.txt'):
                 with open(temp_file.name, 'r') as f:
                     text = f.read()
