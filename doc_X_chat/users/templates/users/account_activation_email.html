@@ -1,0 +1,14 @@
+{% autoescape off %}
+Hello {{ user.username }},
+
+Thank you for registering on our website!
+
+Please click on the link below to activate your account:
+
+{{ domain }}{% url 'users:activate' uid=uid token=token %}
+
+If you encounter any issues with activating your account, please don't hesitate to contact us.
+
+Best regards,
+doc_X_chat
+{% endautoescape %}
