@@ -9,37 +9,48 @@
         {{form.password.errors}}
     </div>
     {% endif %}
-    <div class="form-group">
-        <h2 align="center">Upload Your PDF document</h2>
-        <br>
-        <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <br>
-            <button type="submit" class="btn btn-info">Upload PDF</button>
-        </form>
-    </div>
 
-    <br>
+    <div class="container">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="form-box">
+                <h2 align="center">Upload Your PDF document</h2>
 
-    <div class="chat-history-container">
-        <div class="chat-history">
-            <ul>
-                {% for message in chat_message %}
-                    <li>
-                        <center><small>{{ message.timestamp }}</small></center><br>
-                        <strong>You:</strong> {{ message.message }}<br><br>
-                        <strong>Bot:</strong> {{ message.answer }}<br>
-                    </li>
-                {% endfor %}
-            </ul>
+                <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
+                    {% csrf_token %}
+                    <div class="form-group row align-items-center">
+
+                        <div class="col-md-6">
+                            <input type="file" class="form-control" id="pdfFile" name="pdf_document">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-info">Upload</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
-    <br><br>
 </div>
 
+<br><br>
 
+
+
+<div class="chat-history-container" id="chat-history-container">
+    <div class="chat-history">
+        <ul>
+            {% for message in chat_message %}
+                <li>
+                    <center><small>{{ message.timestamp }}</small></center><br>
+                    <strong>You:</strong> {{ message.message }}<br><br>
+                    <strong>Bot:</strong> {{ message.answer }}<br>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<br><br>
 <div class="container">
     <div class="row">
         <div class="col-md-10">
@@ -49,28 +60,32 @@
                     {% csrf_token %}
                     <div class="form-group row">
                         <label for="textInput" class="col-md-3 col-form-label mt-4"></label>
-                        <div class="col-md-6 d-flex align-items-center">
-                            <input class="form-control flex-grow-1" type="text" id="textInput" name="user_question" placeholder="Type Your Question">
+                        <div class="col-md-6">
+                            <input class="form-control" type="text" id="textInput" name="user_question" placeholder="Type Your Question">
                         </div>
                         <div class="col-md-3">
-                            <input type="image" src="https://i.pinimg.com/originals/60/b6/40/60b6403f7192e21afc0f3194b92df572.jpg" alt="Submit" style="width: 50px; height: 50px; border-radius: 50%; ;" >
+                            <input type="image" src="https://i.pinimg.com/originals/60/b6/40/60b6403f7192e21afc0f3194b92df572.jpg" alt="Submit" style="width: 50px; height: 50px; border-radius: 50%;">
                         </div>
                     </div>
-                    <br>
-                                    <div class="form-group row">
-<!--                    <label for="selected_pdf" class="col-md-3 col-form-label mt-4 d-flex align-items-center">Select PDF:</label>-->
-                    <div class="col-md-6">
-                        <select class="form-control" id="selected_pdf" name="selected_pdf" required>
-                            {% for pdf in user_pdfs %}
-                <option value="{{ pdf.id }}">{{ pdf.title }}</option>
-            {% endfor %}
-        </select>
+                    <div class="form-group row">
+                        <label for="selected_pdf" >Select PDF:</label>
+                        <div class="col-md-6">
+                            <select class="form-control" id="selected_pdf" name="selected_pdf" required>
+                                {% for pdf in user_pdfs %}
+                                    <option value="{{ pdf.id }}">{{ pdf.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
-
+</div>
 
 <style>
-        /* Add this style block within your HTML file or in your CSS file */
+    /* Add this style block within your HTML file or in your CSS file */
     #selected_pdf {
         width: 100%; /* Adjust the percentage value as needed */
     }
@@ -81,18 +96,15 @@
         padding: 10px; /* Опціонально: встановіть відступи */
     }
 
-
-    /* Додайте це до вашого CSS файлу або розділу стилів */
     .chat-history-container {
-    max-height: 300px; /* Встановіть максимальну висоту для контейнера історії чату */
-    overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
-    border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
-    padding: 10px; /* Опціонально: додайте відступ для відокремлення */
-    background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
-    /* background-image: url('your-image-url.jpg'); */ /* Або вставте URL зображення як фон (розкоментуйте цей рядок і замініть 'your-image-url.jpg' на шлях до вашого зображення) */
-    background-size: cover; /* Опціонально: встановіть розмір фону */
-    z-index: 0;
-}
+        max-height: 300px; /* Встановіть максимальну висоту для контейнера історії чату */
+        overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
+        border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
+        padding: 10px; /* Опціонально: додайте відступ для відокремлення */
+        background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
+        background-size: cover; /* Опціонально: встановіть розмір фону */
+        z-index: 0;
+    }
 
     .chat-history ul {
         list-style-type: none;
@@ -103,5 +115,14 @@
         margin-bottom: 10px;
     }
 </style>
+
+<script>
+    // Отримуємо посилання на елемент контейнера
+    var chatHistoryContainer = document.getElementById("chat-history-container");
+
+    // Прокручуємо контейнер до нижнього краю
+    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+</script>
+
 
 {% endblock %}
