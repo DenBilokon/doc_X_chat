@@ -129,11 +129,8 @@ def upload_pdf(request):
     else:
         form = PDFUploadForm()
     user_pdfs = PDFDocument.objects.filter(user=request.user)
-    #chat_message = ChatMessage.objects.all()
+    chat_message = ChatMessage.objects.all()
     return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
-
-
-
 
 
 @login_required(login_url="/login/")
@@ -150,7 +147,7 @@ def ask_question(request):
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     user_question = ""
-    selected_pdf = None
+    selected_pdf = None  # Змінено з selected_pdf_id на об'єкт PDFDocument
 
     if request.method == 'POST':
         user_question = request.POST.get('user_question')
@@ -170,18 +167,14 @@ def ask_question(request):
         chat_response = response["answer"]
         print(f'chat_response: {chat_response}')
         chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
-                                   pdf_document=selected_pdf)
+                                   pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
+
         chat_message.save()
 
-    # Отримуємо всі PDF-документи користувача
     user_pdfs = PDFDocument.objects.filter(user=request.user)
 
-    # Отримуємо чатові повідомлення, які відносяться до обраного PDF-документа користувача
-    chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).all()
-
-    # Отримуємо історію чату для обраного користувача та PDF-документа
-    chat_history = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by(
-        'timestamp')[:10]
+    # Отримуємо повідомлення, які відносяться до обраного PDFDocument
+    chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by('timestamp')
 
     context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question,
                'user_pdfs': user_pdfs, 'chat_message': chat_message}
@@ -189,6 +182,17 @@ def ask_question(request):
     return render(request, 'chat_llm/chat_base.html', context)
 
 
+@login_required(login_url="/login/")
+def get_chat_history(request):
+    pdf_id = request.GET.get('pdf_id')
+    if not pdf_id:
+        return JsonResponse({"error": "PDF ID not provided"}, status=400)
+
+    # Тут ви отримуєте історію чату для даного pdf_id
+    # Це припущення, що у вас є модель ChatMessage або щось подібне
+    messages = ChatMessage.objects.filter(pdf_document_id=pdf_id).values('message', 'answer', 'timestamp')
+
+    return JsonResponse(list(messages), safe=False)
 
 
 @login_required(login_url="/login/")
