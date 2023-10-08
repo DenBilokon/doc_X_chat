@@ -14,6 +14,7 @@
         {{form.password.errors}}
     </div>
     {% endif %}
+
     {% for message in messages %}
     <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
     {% endfor %}
@@ -72,6 +73,50 @@
         </div>
     </div>
 </div>
+</div>
+
+
+<style>
+    /* Add this style block within your HTML file or in your CSS file */
+    #selected_pdf {
+        width: 100%; /* Adjust the percentage value as needed */
+    }
+
+    .fixed-bottom {
+        /* Опціонально: стиль для фіксованого блоку внизу */
+        background-color: #f5f5f5; /* Задайте бажаний фон */
+        padding: 10px; /* Опціонально: встановіть відступи */
+    }
+
+    .chat-history-container {
+        max-height: 300px; /* Встановіть максимальну висоту для контейнера історії чату */
+        overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
+        border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
+        padding: 10px; /* Опціонально: додайте відступ для відокремлення */
+        background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
+        background-size: cover; /* Опціонально: встановіть розмір фону */
+        z-index: 0;
+    }
+
+    .chat-history ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .chat-history li {
+        margin-bottom: 10px;
+    }
+</style>
+
+<script>
+    // Отримуємо посилання на елемент контейнера
+    var chatHistoryContainer = document.getElementById("chat-history-container");
+
+    // Прокручуємо контейнер до нижнього краю
+    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+</script>
+
+
 
 <!-- JavaScript goes at the end -->
 <script>
