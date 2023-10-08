@@ -109,6 +109,9 @@ def upload_pdf(request):
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
 
+            if pdf_document.size > 50 * 1024 * 1024:  # Розмір файлу понад 50 МБ
+                return JsonResponse({'error': 'Розмір файлу перевищує 50 МБ.'}, status=400)
+
             # Перевірити, чи користувач перевищив обмеження для завантажених файлів
             if user_data.total_files_uploaded >= max_files_allowed:
                 return JsonResponse({'error': 'Ви досягли обмеження для завантажених файлів.'}, status=400)

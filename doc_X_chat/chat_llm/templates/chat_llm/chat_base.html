@@ -39,9 +39,6 @@
     <div class="row">
         <div class="col-md-12">
             <h1>Ask a Question</h1>
-
-
-
             <div class="form-box">
             <form action="{% url 'ask_question' %}" method="post">
                 {% csrf_token %}
@@ -57,7 +54,6 @@
                         {% endfor %}
                     </select>
                 </div>
-
 
                     <br>
                     <button type="submit" class="btn btn-primary">ASK</button>
