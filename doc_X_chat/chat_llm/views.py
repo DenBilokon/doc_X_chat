@@ -129,8 +129,8 @@ def upload_pdf(request):
     else:
         form = PDFUploadForm()
     user_pdfs = PDFDocument.objects.filter(user=request.user)
-    chat_message = ChatMessage.objects.all()
-    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs, 'chat_message': chat_message})
+    #chat_message = ChatMessage.objects.all()
+    return render(request, 'chat_llm/chat_base.html', {'form': form, 'user_pdfs': user_pdfs})
 
 
 
@@ -150,7 +150,7 @@ def ask_question(request):
     chat_response = ''
     user_pdfs = PDFDocument.objects.filter(user=request.user)
     user_question = ""
-    selected_pdf = None  # Змінено з selected_pdf_id на об'єкт PDFDocument
+    selected_pdf = None
 
     if request.method == 'POST':
         user_question = request.POST.get('user_question')
@@ -170,19 +170,25 @@ def ask_question(request):
         chat_response = response["answer"]
         print(f'chat_response: {chat_response}')
         chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
-                                   pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
-
+                                   pdf_document=selected_pdf)
         chat_message.save()
 
+    # Отримуємо всі PDF-документи користувача
     user_pdfs = PDFDocument.objects.filter(user=request.user)
 
-    # Отримуємо повідомлення, які відносяться до обраного PDFDocument
-    chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by('timestamp')
+    # Отримуємо чатові повідомлення, які відносяться до обраного PDF-документа користувача
+    chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).all()
+
+    # Отримуємо історію чату для обраного користувача та PDF-документа
+    chat_history = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by(
+        'timestamp')[:10]
 
     context = {'chat_response': chat_response, 'chat_history': chat_history, 'user_question': user_question,
                'user_pdfs': user_pdfs, 'chat_message': chat_message}
 
     return render(request, 'chat_llm/chat_base.html', context)
+
+
 
 
 @login_required(login_url="/login/")

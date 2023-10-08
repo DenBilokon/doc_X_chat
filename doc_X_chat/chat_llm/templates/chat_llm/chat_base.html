@@ -35,6 +35,7 @@
 
         <hr>
         <h4 style="color: white;">Select a PDF</h4>
+
         <div class="form-group">
             <label for="sidenav_selected_pdf">Select a PDF:</label>
             <select class="form-control" id="sidenav_selected_pdf" required>
@@ -45,6 +46,14 @@
         </div>
     </div>
     <hr>
+
+
+
+
+
+
+
+
     <h4 class="text-center" style="color: white;">Select a PDF</h4>
     <div class="text">
         {% for pdf in user_pdfs %}
@@ -53,11 +62,12 @@
     </div>
 </div>
 
-
+{% if chat_message %}
 <div class="container">
     <div id="main">
         <div class="chat-history-container" id="chat-history-container">
             <div class="chat-history">
+
                 <ul>
                     {% for message in chat_message %}
                     <li>
@@ -68,8 +78,11 @@
                     </li>
                     {% endfor %}
                 </ul>
+
             </div>
         </div>
+        {% endif %}
+
         <br><br>
         <div class="container">
             <div class="row">
