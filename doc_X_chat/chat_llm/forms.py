@@ -1,6 +1,5 @@
 from django import forms
-from django.forms import SelectDateWidget, FileInput, FileField
-
+from django.forms import FileInput
 from .models import PDFDocument, ChatMessage, CustomProfile
 from django.contrib.auth.forms import UserCreationForm
 
