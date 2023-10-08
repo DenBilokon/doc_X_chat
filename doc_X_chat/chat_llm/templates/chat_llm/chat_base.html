@@ -1,7 +1,12 @@
 {% extends 'chat_llm/base.html' %}
 {% load static %}
 {% block content %}
-<div class="container">
+
+
+<span style="font-size:30px;cursor:pointer" onclick="toggleNav()">&#9776; Menu</span>
+
+<div id="mySidenav" class="sidenav">
+    <!-- Повідомлення та помилки -->
     {% if form.errors %}
     <div class="alert alert-danger" role="alert">
         {{form.non_field_errors}}
@@ -9,70 +14,139 @@
         {{form.password.errors}}
     </div>
     {% endif %}
-    <div class="row">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
+    <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
+    <div class="text-center">
+        <h4 style="color: white;">Upload new PDF</h4>
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}" id="uploadForm">
+            {% csrf_token %}
 
-        <div class="col-md-9">
-            <h2>Upload new PDF</h2>
-            <form method="post" enctype="multipart/form-data" action="{% url 'upload_pdf' %}">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Upload</button>
-            </form>
-            <hr>
-            <h2>Chat</h2>
-            <ul>
+            <!-- Невидимий input для завантаження файлу -->
+            <input type="file" name="{{ form.pdf_document.name }}" id="{{ form.pdf_document.auto_id }}"
+                   onchange="submitForm();" style="display: none;">
 
-                <li>
-                    <br>
-                    Question: {{ user_question }}<br>
-                    Answer: {{ chat_response }}
-                    Date: {{ timestamp }}
-                </li>
+            <!-- Зображення-кнопка -->
+            <img src="{% static 'chat_llm/img/upload_file.png' %}" height="50" alt="Upload Image" id="uploadImage"
+                 onclick="triggerFileSelect();" style="cursor: pointer;">
 
-            </ul>
+        </form>
+
+        <hr>
+        <h4 style="color: white;">Select a PDF</h4>
+        <div class="form-group">
+            <label for="sidenav_selected_pdf">Select a PDF:</label>
+            <select class="form-control" id="sidenav_selected_pdf" required>
+                {% for pdf in user_pdfs %}
+                <option value="{{ pdf.id }}">{{ pdf.title }}</option>
+                {% endfor %}
+            </select>
         </div>
     </div>
 </div>
-
-
 <div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>Ask a Question</h1>
+    <div id="main">
+        <h2>Chat</h2>
+        <ul>
+            <li>
+                <br>
+                Question: {{ user_question }}<br>
+                Answer: {{ chat_response }}<br>
+                Date: {{ timestamp }}
+            </li>
+        </ul>
 
-
-
-            <div class="form-box">
+        <h1>Ask a Question</h1>
+        <div class="form-box">
             <form action="{% url 'ask_question' %}" method="post">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="textInput" class="form-label mt-4">Enter Text:</label>
                     <input class="form-control" type="text" id="textInput" name="user_question">
+                    <!-- Цей прихований елемент буде використовуватися для передачі вибраного PDF -->
+                    <input type="hidden" name="selected_pdf" id="main_selected_pdf">
                 </div>
-                <div class="form-group">
-                    <label for="selected_pdf">Select a PDF:</label>
-                    <select class="form-control" id="selected_pdf" name="selected_pdf" required>
-                        {% for pdf in user_pdfs %}
-                            <option value="{{ pdf.id }}">{{ pdf.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-
-                    <br>
-                    <button type="submit" class="btn btn-primary">ASK</button>
-                </form>
-            </div>
-
-
-
+                <button type="submit" class="btn btn-primary">ASK</button>
+            </form>
         </div>
     </div>
 </div>
 
+<!-- JavaScript goes at the end -->
+<script>
+    function submitForm() {
+    document.getElementById("uploadForm").submit();
+}
+
+function triggerFileSelect() {
+    document.getElementById("{{ form.pdf_document.auto_id }}").click();
+}
+
+    function toggleNav() {
+     var sidenav = document.getElementById("mySidenav");
+     if (sidenav.style.width == "0px" || sidenav.style.width == "") {
+         sidenav.style.width = "250px";
+         document.getElementById("main").style.marginLeft = "250px";
+     } else {
+         sidenav.style.width = "0";
+         document.getElementById("main").style.marginLeft= "0";
+     }
+ }
+    document.getElementById("textInput").addEventListener("focus", function() {
+    var selectedPdfValue = document.getElementById("sidenav_selected_pdf").value;
+    document.getElementById("main_selected_pdf").value = selectedPdfValue;
+});
+
+</script>
+<script>
+    // повідомлення зникає через 5 сек
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000);
+</script>
+
+<style>
+    #main {
+    margin-left: 250px; /* Додаємо цей рядок */
+}
+    .sidenav {
+    height: 100%;
+    width: 250px; /* Зміна тут */
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgba(7, 7, 7, 0.9); /* 0.9 - це рівень прозорості */
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
 
 
+.sidenav a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
 
+.sidenav a:hover {
+    color: #f1f1f1;
+}
 
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
 
+</style>
 {% endblock %}
