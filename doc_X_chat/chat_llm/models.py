@@ -30,6 +30,7 @@ class PDFDocument(models.Model):
 
 class ChatMessage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pdf_document = models.ForeignKey(PDFDocument, on_delete=models.CASCADE, null=True)
     message = models.TextField()
     question = models.TextField()
     answer = models.TextField()
