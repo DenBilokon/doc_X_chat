@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "doc-x-chat"
+version = "0.1.0"
+description = ""
+authors = ["Sanyavas"]
+license = "Licence"
+readme = "README.md"
+packages = [{include = "doc_x_chat"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+docx2txt = "^0.8"
+python-pptx = "^0.6.22"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
