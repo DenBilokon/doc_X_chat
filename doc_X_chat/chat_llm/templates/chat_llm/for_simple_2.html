@@ -8,7 +8,17 @@
 {% with selected_pdf_id=request.POST.selected_pdf|default:"" %}
 
 <div id="mySidenav" class="sidenav">
-
+    <!-- Повідомлення та помилки -->
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{form.non_field_errors}}
+        {{form.username.errors}}
+        {{form.password.errors}}
+    </div>
+    {% endif %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
     <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
     <div class="text-center">
         <label style="color: white;" for="uploadForm" class="form-label mt-4">Update file:</label>
@@ -41,17 +51,7 @@
         {% endfor %}
     </div>
 </div>
-<!-- Повідомлення та помилки -->
-    {% if form.errors %}
-    <div class="alert alert-danger" role="alert">
-        {{form.non_field_errors}}
-        {{form.username.errors}}
-        {{form.password.errors}}
-    </div>
-    {% endif %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-    {% endfor %}
+
 
 <div class="container">
     <div id="main">
@@ -88,21 +88,18 @@
                 <div class="col-md-12">
                     <div class="form-box ">
                         <!-- Add d-flex and align-items-center for horizontal alignment -->
-                        <form action="{% url 'ask_question' %}" method="post" class="form-inline flex-grow-1 mr-3" id="questionForm">
-
+                        <form action="{% url 'ask_question' %}" method="post" class="form-inline flex-grow-1 mr-3">
                             <!-- Add flex-grow-1 and mr-3 -->
                             {% csrf_token %}
 <!--                            <label for="textInput" class="form-label mt-4">Enter Text:</label>-->
                             <input class="form-control" type="text" id="textInput" name="user_question">
                             <input type="hidden" name="selected_pdf" id="main_selected_pdf">
-                        </form>
-                        <div>
-                            <input type="image"
-                                   src="{% static 'chat_llm/img/pik.png' %}"
-                                   alt="Submit" style="width: 30px; margin-left: 10px;">
-                        </div>
-                    </div>
 
+                            <input type="image"
+                                   src="{% static 'chat_llm/img/iconX.png' %}"
+                                   alt="Submit" style="width: 30px; margin-left: 10px;">
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,43 +109,15 @@
 <!-- JavaScript goes at the end -->
 <script>
     function submitForm() {
-    // Створюємо новий об'єкт FormData
-    let formData = new FormData(document.getElementById("uploadForm"));
-
-    // Виконуємо запит на сервер
-    fetch('{% url 'upload_pdf' %}', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())  // Перетворюємо відповідь у JSON
-    .then(data => {
-        if (data.error) {
-            // Якщо у відповіді є ключ 'error', покажіть повідомлення користувачеві
-            Swal.fire({
-                icon: 'error',
-                title: 'Помилка',
-                text: data.error,
-            });
-        } else {
-            // Обробляємо успішну відповідь (наприклад, перезавантаження сторінки або показування підтвердження)
-            location.reload();
-        }
-    })
-    .catch(error => {
-        console.error('Помилка:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Помилка',
-            text: 'Виникла невідома помилка. Спробуйте ще раз.',
-        });
-    });
+    document.getElementById("uploadForm").submit();
 }
-
 
 
 function triggerFileSelect() {
+    console.log("Trying to trigger file input.");
     document.getElementById("{{ form.pdf_document.auto_id }}").click();
 }
+
 
     function toggleNav() {
      var sidenav = document.getElementById("mySidenav");
@@ -242,22 +211,6 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
         });
     }, 5000);
 </script>
-<script>
-    document.getElementById("questionForm").addEventListener("submit", function(event) {
-    var textInput = document.getElementById("textInput").value.trim();
-
-    if (!textInput) {
-        event.preventDefault();
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Please enter a message before sending.',
-            confirmButtonColor: '#3085d6',
-        });
-    }
-});
-
-</script>
 <style>
     .chat-history-container {
     padding: 20px;
@@ -325,20 +278,41 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
     #ask-form {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: #f5f5f5;
+    left: 50%;  /* Зміщення вліво на 50% ширини viewport */
+    transform: translateX(-50%);  /* Зсув блоку назад на 50% його власної ширини, щоб він центрувався горизонтально */
+    width: 70%;  /* Змініть це значення, щоб зробити блок ширшим чи вужчим */
     z-index: 1000;
-    padding: 25px;
-    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+}
+
+
 }
 
 .form-box {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start; /* Змінено на "flex-start", щоб розташувати елементи зліва */
     align-items: center;
-    margin-left: 10px; /* Ви можете змінити значення, щоб отримати бажаний результат */
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
 }
+
+.form-box .form-control {
+    width: 100%; /* Зменшено ширину текстового поля до 60% від ширини блоку .form-box */
+    padding: 8px 15px;
+    margin-left: 10px; /* Додано відступ зліва від кнопки */
+    border-radius: 5px;
+}
+
+.form-box input[type="image"] {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
 
 </style>
 

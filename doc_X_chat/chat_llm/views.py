@@ -15,7 +15,7 @@ from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfFileReader, PdfReader
 from pptx import Presentation
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
@@ -41,8 +41,8 @@ def get_pdf_text(file):
             temp_file.write(file.read())
             temp_file.flush()
             if file.name.endswith('.pdf'):
-                pdf_reader = PdfFileReader(temp_file.name)
-                text = ''.join(page.extractText() for page in pdf_reader.pages)
+                pdf_reader = PdfReader(temp_file.name)
+                text = ''.join(page.extract_text() for page in pdf_reader.pages)
             elif file.name.endswith('.txt'):
                 with open(temp_file.name, 'r') as f:
                     text = f.read()
@@ -128,8 +128,15 @@ def upload_pdf(request):
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
 
-            if pdf_document.size > 50 * 1024 * 1024:  # File size exceeds 50 MB
-                return JsonResponse({'error': 'File size exceeds 50 MB.'}, status=400)
+
+            # Перевірка розширення файлу
+            _, file_extension = os.path.splitext(pdf_document.name)
+            if file_extension.lower() != '.pdf':
+                return JsonResponse({'error': 'Завантажте лише PDF файл.'}, status=400)
+
+            if pdf_document.size > 50 * 1024 * 1024:  # Розмір файлу понад 50 МБ
+                return JsonResponse({'error': 'Розмір файлу перевищує 50 МБ.'}, status=400)
+
 
             # Check if the user has exceeded the limit for uploaded files
             if user_data.total_files_uploaded >= max_files_allowed:

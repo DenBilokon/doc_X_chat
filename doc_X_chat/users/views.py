@@ -37,6 +37,7 @@ class RegisterView(View):
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
+
             username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
             password1 = form.cleaned_data.get('password1')
@@ -88,6 +89,7 @@ class RegisterView(View):
             messages.success(request,
                              f"Hello {user.username}! Your account has been created. Please check your email to "
                              f"confirm your account.")
+
             return redirect(to="users:login")
         return render(request, self.template_name, {'form': form})
 
