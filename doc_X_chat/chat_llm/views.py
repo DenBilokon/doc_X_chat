@@ -128,6 +128,7 @@ def upload_pdf(request):
         if form.is_valid():
             pdf_document = request.FILES['pdf_document']
 
+
             # Перевірка розширення файлу
             _, file_extension = os.path.splitext(pdf_document.name)
             if file_extension.lower() != '.pdf':
@@ -136,13 +137,14 @@ def upload_pdf(request):
             if pdf_document.size > 50 * 1024 * 1024:  # Розмір файлу понад 50 МБ
                 return JsonResponse({'error': 'Розмір файлу перевищує 50 МБ.'}, status=400)
 
-            # Перевірити, чи користувач перевищив обмеження для завантажених файлів
-            if user_data.total_files_uploaded >= max_files_allowed:
-                return JsonResponse({'error': 'Ви досягли обмеження для завантажених файлів.'}, status=400)
 
-            # Перевірити, чи файл з такою назвою вже існує для цього користувача
+            # Check if the user has exceeded the limit for uploaded files
+            if user_data.total_files_uploaded >= max_files_allowed:
+                return JsonResponse({'error': 'You have reached the limit for uploaded files.'}, status=400)
+
+            # Check if a file with the same name already exists for this user
             if PDFDocument.objects.filter(user=user, title=pdf_document.name).exists():
-                return JsonResponse({'error': 'Файл з такою назвою вже існує.'}, status=400)
+                return JsonResponse({'error': 'A file with the same name already exists.'}, status=400)
 
             # Збільшити кількість завантажених файлів користувача
             user_data.total_files_uploaded += 1
@@ -168,6 +170,17 @@ def ask_question(request):
     :param request: HTTP request.
     :return: Rendered page with the response.
     """
+    user = request.user
+
+    try:
+        user_data = UserData.objects.get(user=user)
+    except UserData.DoesNotExist:
+        # Обробка ситуації, коли відсутній запис UserData для користувача.
+        # Можна створити запис за замовчуванням тут.
+        user_data = UserData.objects.create(user=user, subscribe_plan='free', total_files_uploaded=0,
+                                            total_questions_asked=0)
+
+    max_questions_allowed = user_data.max_questions_allowed_for_plan()
 
     chat_history = ChatMessage.objects.filter(user=request.user).order_by(
         'timestamp')[:10]
@@ -176,7 +189,12 @@ def ask_question(request):
     user_question = ""
     selected_pdf = None  # Змінено з selected_pdf_id на об'єкт PDFDocument
 
+
     if request.method == 'POST':
+        # Check if the user has exceeded the limit for questions per file
+        if user_data.total_questions_asked >= max_questions_allowed:
+            return JsonResponse({'error': 'You have reached the limit for questions.'}, status=400)
+
         user_question = request.POST.get('user_question')
         print(f'user question:  {user_question}')
         selected_pdf_id = request.POST.get('selected_pdf')
@@ -195,10 +213,9 @@ def ask_question(request):
         print(f'chat_response: {chat_response}')
         chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
                                    pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
-
+        user_data.total_questions_asked += 1
+        user_data.save()
         chat_message.save()
-
-    user_pdfs = PDFDocument.objects.filter(user=request.user)
 
     # Отримуємо повідомлення, які відносяться до обраного PDFDocument
     chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by('timestamp')

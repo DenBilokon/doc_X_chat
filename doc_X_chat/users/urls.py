@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetDoneVi
     PasswordResetCompleteView, FormView
 from .forms import LoginForm
 from .views import RegisterView, ResetPasswordView, profile, upload_avatar, signup_redirect, update_user, \
-    user_plan_subscription, activate_account
+    user_plan_subscription, activate_account, user_statistic
 
 app_name = "users"
 
@@ -30,6 +30,6 @@ urlpatterns = [
     path('social/signup/', signup_redirect, name='signup_redirect'),
     path('update_user/', update_user, name='update_user'),
     path('user_plan_subscription/', user_plan_subscription, name='user_plan_subscription'),
-    path('activate/<str:uid>/<str:token>/', activate_account, name='activate')
-
+    path('activate/<str:uid>/<str:token>/', activate_account, name='activate'),
+    path('user_statistic/', user_statistic, name='user_statistic'),
 ]
