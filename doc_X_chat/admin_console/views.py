@@ -1,9 +1,13 @@
 from django.utils import timezone
-
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.shortcuts import render
 
 from chat_llm.models import UserData
+
+
+def is_admin(user):
+    return user.is_authenticated and user.is_superuser
 
 
 def get_user_data(user_id):
@@ -15,7 +19,9 @@ def get_user_data(user_id):
     return user_data
 
 
+@user_passes_test(is_admin)
 def get_all_users_data(request):
+    # Ось ваша поточна логіка функції
     current_time = timezone.now()
     users_all_data = User.objects.all()
 

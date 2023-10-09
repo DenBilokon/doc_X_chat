@@ -129,7 +129,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',  # Авторизація через django-allauth
 )
 
-SITE_ID = 5
+SITE_ID = 6
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
