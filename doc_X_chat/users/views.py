@@ -78,7 +78,7 @@ class RegisterView(View):
             mail_subject = 'Activate your account'
             message = render_to_string('users/account_activation_email.html', {
                 'user': user,
-                'domain': '127.0.0.1:8000',
+                'domain': 'docsxchat.fly.dev',
                 'uid': uid,
                 'token': token,
             })

@@ -15,6 +15,7 @@ from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 
+
 from PyPDF2 import PdfFileReader, PdfReader
 from pptx import Presentation
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
@@ -66,6 +67,7 @@ def get_text_chunks(text):
     :param text: Input text.
     :return: List of text chunks.
     """
+
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     chunks = text_splitter.split_text(text)
     return chunks
@@ -131,12 +133,11 @@ def upload_pdf(request):
 
             # Перевірка розширення файлу
             _, file_extension = os.path.splitext(pdf_document.name)
-            if file_extension.lower() != '.pdf':
-                return JsonResponse({'error': 'Завантажте лише PDF файл.'}, status=400)
+            if file_extension.lower() not in [".pdf", ".txt", ".docx", ".pptx"]:
+                return JsonResponse({'error': 'Only PDF, TXT, DOCX, PPTX files'}, status=400)
 
             if pdf_document.size > 50 * 1024 * 1024:  # Розмір файлу понад 50 МБ
-                return JsonResponse({'error': 'Розмір файлу перевищує 50 МБ.'}, status=400)
-
+                return JsonResponse({'error': "File size exceeds 50 MB."}, status=400)
 
             # Check if the user has exceeded the limit for uploaded files
             if user_data.total_files_uploaded >= max_files_allowed:
@@ -189,33 +190,28 @@ def ask_question(request):
     user_question = ""
     selected_pdf = None  # Змінено з selected_pdf_id на об'єкт PDFDocument
 
-
     if request.method == 'POST':
         # Check if the user has exceeded the limit for questions per file
         if user_data.total_questions_asked >= max_questions_allowed:
             return JsonResponse({'error': 'You have reached the limit for questions.'}, status=400)
+        else:
+            user_question = request.POST.get('user_question')
+            selected_pdf_id = request.POST.get('selected_pdf')
+            selected_pdf = get_object_or_404(PDFDocument, id=selected_pdf_id)
+            text_chunks = get_text_chunks(selected_pdf.documentContent)
 
-        user_question = request.POST.get('user_question')
-        print(f'user question:  {user_question}')
-        selected_pdf_id = request.POST.get('selected_pdf')
-        print(f'selected_pdf_id:  {selected_pdf_id}')
-        selected_pdf = get_object_or_404(PDFDocument, id=selected_pdf_id)
-        text_chunks = get_text_chunks(selected_pdf.documentContent)
+            knowledge_base = get_vectorstore(text_chunks)
+            conversation_chain = get_conversation_chain(knowledge_base)
 
-        knowledge_base = get_vectorstore(text_chunks)
-        conversation_chain = get_conversation_chain(knowledge_base)
+            with get_openai_callback() as cb:
+                response = conversation_chain({'question': user_question})
 
-        with get_openai_callback() as cb:
-            response = conversation_chain({'question': user_question})
-            print(f'response: {response}')
-
-        chat_response = response["answer"]
-        print(f'chat_response: {chat_response}')
-        chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
-                                   pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
-        user_data.total_questions_asked += 1
-        user_data.save()
-        chat_message.save()
+            chat_response = response["answer"]
+            chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
+                                       pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
+            user_data.total_questions_asked += 1
+            user_data.save()
+            chat_message.save()
 
     # Отримуємо повідомлення, які відносяться до обраного PDFDocument
     chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by('timestamp')
