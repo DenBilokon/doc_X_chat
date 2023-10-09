@@ -57,7 +57,6 @@ def get_pdf_text(file):
                         if hasattr(shape, "text"):
                             text_runs.append(shape.text)
                 text = '\n'.join(text_runs)
-
     return text
 
 
