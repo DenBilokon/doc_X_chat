@@ -42,23 +42,25 @@
     </div>
 </div>
 <!-- Повідомлення та помилки -->
-    {% if form.errors %}
-    <div class="alert alert-danger" role="alert">
-        {{form.non_field_errors}}
-        {{form.username.errors}}
-        {{form.password.errors}}
-    </div>
-    {% endif %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-    {% endfor %}
+{% if form.errors %}
+<div class="alert alert-danger" role="alert">
+    {{form.non_field_errors}}
+    {{form.username.errors}}
+    {{form.password.errors}}
+</div>
+{% endif %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+{% endfor %}
 
 <div class="container">
     <div id="main">
         <div class="chat-history-container" id="chat-history-container">
             <div class="chat-history">
                 <ul>
+
                     {% for message in chat_message %}
+
                     <li>
                         <div class="text-center">
 
@@ -76,6 +78,7 @@
                         </div>
                     </li>
                     {% endfor %}
+
                 </ul>
             </div>
         </div>
@@ -86,178 +89,25 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-box ">
-                        <!-- Add d-flex and align-items-center for horizontal alignment -->
-                        <form action="{% url 'ask_question' %}" method="post" class="form-inline flex-grow-1 mr-3" id="questionForm">
-
-                            <!-- Add flex-grow-1 and mr-3 -->
+                    <div class="form-box">
+                        <form action="{% url 'ask_question' %}" method="post" id="questionForm">
                             {% csrf_token %}
-<!--                            <label for="textInput" class="form-label mt-4">Enter Text:</label>-->
-                            <input class="form-control" type="text" id="textInput" name="user_question">
                             <input type="hidden" name="selected_pdf" id="main_selected_pdf">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button class="btn" type="submit"><img src="{% static 'chat_llm/img/pik.png' %}"
+                                                                           alt="Submit"></button>
+                                </div>
+                                <input class="form-control" type="text" id="textInput" name="user_question">
+                            </div>
                         </form>
-                        <div>
-                            <input type="image"
-                                   src="{% static 'chat_llm/img/pik.png' %}"
-                                   alt="Submit" style="width: 30px; margin-left: 10px;">
-                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
+
 </div>
-
-<!-- JavaScript goes at the end -->
-<script>
-    function submitForm() {
-    // Створюємо новий об'єкт FormData
-    let formData = new FormData(document.getElementById("uploadForm"));
-
-    // Виконуємо запит на сервер
-    fetch('{% url 'upload_pdf' %}', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())  // Перетворюємо відповідь у JSON
-    .then(data => {
-        if (data.error) {
-            // Якщо у відповіді є ключ 'error', покажіть повідомлення користувачеві
-            Swal.fire({
-                icon: 'error',
-                title: 'ERROR',
-                text: data.error,
-            });
-        } else {
-            // Обробляємо успішну відповідь (наприклад, перезавантаження сторінки або показування підтвердження)
-            location.reload();
-        }
-    })
-    .catch(error => {
-        console.error('Помилка:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Помилка',
-            text: 'Виникла невідома помилка. Спробуйте ще раз.',
-        });
-    });
-}
-
-
-
-function triggerFileSelect() {
-    document.getElementById("{{ form.pdf_document.auto_id }}").click();
-}
-
-    function toggleNav() {
-     var sidenav = document.getElementById("mySidenav");
-     if (sidenav.style.width == "0px" || sidenav.style.width == "") {
-         sidenav.style.width = "250px";
-         document.getElementById("main").style.marginLeft = "250px";
-     } else {
-         sidenav.style.width = "0";
-         document.getElementById("main").style.marginLeft= "0";
-     }
- }
-
-    document.getElementById("textInput").addEventListener("focus", function() {
-    var selectedPdfValue = document.getElementById("sidenav_selected_pdf").value;
-    document.getElementById("main_selected_pdf").value = selectedPdfValue;
-});
-
-// форматування часу
-function formatTimestamp(timestampStr) {
-    const timestamp = new Date(timestampStr);
-    const options = {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-    };
-
-    let formatted = new Intl.DateTimeFormat('en-US', options).format(timestamp);
-
-    formatted = formatted.replace(/, (\d{4}),/, ", $1,")
-                         .replace(/:\d{2} /, ' ')
-                         .replace(" AM", " a.m.")
-                         .replace(" PM", " p.m.");
-
-    return formatted;
-}
-
-// виводити історію при виборі файлу
-document.getElementById("sidenav_selected_pdf").addEventListener("change", function() {
-    let selectedPdf = this.value;
-
-    fetch(`/get_chat_history?pdf_id=${selectedPdf}`)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        const chatHistoryList = document.querySelector(".chat-history");
-        chatHistoryList.innerHTML = ""; // Очищуємо поточний список повідомлень
-
-        data.forEach(message => {
-            let formattedTimestamp = formatTimestamp(message.timestamp);
-            let messageItem = `
-                <li>
-                    <div class="text-center">
-                        <p>${formattedTimestamp}</p>
-                    </div>
-
-                    <div class="container user">
-                        <img src="{{ avatar_url }}" alt="Avatar">
-                        <p>${message.message}</p>
-                    </div>
-
-                    <div class="container darker">
-                        <img src="{% static 'chat_llm/img/iconX.png' %}" alt="Avatar" class="right">
-                        <p>${message.answer}</p>
-                    </div>
-                </li>
-            `;
-            chatHistoryList.innerHTML += messageItem;
-        });
-    })
-    .catch(error => {
-        console.error('There was a problem with the fetch operation:', error.message);
-        // Додайте повідомлення про помилку для користувача, якщо це необхідно.
-        // Наприклад: alert('Sorry, there was a problem loading the chat history.');
-    });
-});
-</script>
-<script>
-    // повідомлення зникає через 5 сек
-    setTimeout(function(){
-        var alerts = document.querySelectorAll(".alert");
-        alerts.forEach(function(alert){
-            alert.style.display = "none";
-        });
-    }, 5000);
-</script>
-<script>
-    document.getElementById("questionForm").addEventListener("submit", function(event) {
-    var textInput = document.getElementById("textInput").value.trim();
-
-    if (!textInput) {
-        event.preventDefault();
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Please enter a message before sending.',
-            confirmButtonColor: '#3085d6',
-        });
-    }
-});
-
-</script>
 <style>
     .chat-history-container {
     padding: 20px;
@@ -322,30 +172,72 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
     }
 </style>
 <style>
+    /* Стилі для форми, яка прикріплена до низу */
+
     #ask-form {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: #f5f5f5;
+    left: 50%;  /* Відцентрування по горизонталі */
+    transform: translateX(-50%);  /* Зсув вліво на 50% власної ширини, щоб він центрувався горизонтально */
     z-index: 1000;
-    padding: 25px;
-    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+    padding: 50px;
+    width: 1100px;
 }
 
 .form-box {
-    display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
-    margin-left: 10px; /* Ви можете змінити значення, щоб отримати бажаний результат */
+    padding: 5px 5px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 1100px;
+
 }
+
+    .form-box .form-control {
+        width: 100%;
+        padding: 8px 15px;
+        margin-left: 0px;
+        border-radius: 5px;
+    }
+
+    /* Кнопка справа від поля вводу */
+
+    .input-group {
+        position: relative;
+        width: 100%;
+        max-width: 1000px; /* Збільшена довжина поля вводу */
+    }
+
+    .input-group-prepend {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn {
+        margin-left: 10px; /* Змінено з margin-right на margin-left */
+    }
+
+    .form-control {
+        padding-right: 20px; /* Додаємо відступ справа для текстового поля, замість відступу зліва */
+    }
+
+    /* Стилі для зображення в кнопці */
+
+    .input-group img {
+        max-height: 20px;
+    }
 
 </style>
 
 <style>
-    #main {
-    margin-left: 250px; /* Додаємо цей рядок */
-}
+
     .sidenav {
     height: 100%;
     width: 250px; /* Зміна тут */
@@ -396,6 +288,8 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
         background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
         background-size: cover; /* Опціонально: встановіть розмір фону */
         z-index: 0;
+        margin-left: 250px;
+        position: fixed;
     }
 
     .chat-history ul {
@@ -407,11 +301,158 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
         margin-bottom: 10px;
     }
 </style>
+<!-- JavaScript goes at the end -->
+<script>
+    function submitForm() {
+    // Створюємо новий об'єкт FormData
+    let formData = new FormData(document.getElementById("uploadForm"));
 
+    // Виконуємо запит на сервер
+    fetch('{% url 'upload_pdf' %}', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())  // Перетворюємо відповідь у JSON
+    .then(data => {
+        if (data.error) {
+            // Якщо у відповіді є ключ 'error', покажіть повідомлення користувачеві
+            Swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                text: data.error,
+            });
+        } else {
+            // Обробляємо успішну відповідь (наприклад, перезавантаження сторінки або показування підтвердження)
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Помилка:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Unknown error.Try again',
+        });
+    });
+}
+
+
+
+function triggerFileSelect() {
+    document.getElementById("{{ form.pdf_document.auto_id }}").click();
+}
+
+    function toggleNav() {
+     var sidenav = document.getElementById("mySidenav");
+     if (sidenav.style.width == "0px" || sidenav.style.width == "") {
+         sidenav.style.width = "250px";
+
+         // якщо потрібно щоб елемент змістився як меню вистав px
+         document.getElementById("main").style.marginLeft = "0px";
+     } else {
+         sidenav.style.width = "0";
+         document.getElementById("main").style.marginLeft= "0";
+     }
+ }
+
+    document.getElementById("textInput").addEventListener("focus", function() {
+    var selectedPdfValue = document.getElementById("sidenav_selected_pdf").value;
+    document.getElementById("main_selected_pdf").value = selectedPdfValue;
+});
+
+// форматування часу
+function formatTimestamp(timestampStr) {
+    const timestamp = new Date(timestampStr);
+    const options = {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    };
+
+    let formatted = new Intl.DateTimeFormat('en-US', options).format(timestamp);
+
+    formatted = formatted.replace(/, (\d{4}),/, ", $1,")
+                         .replace(/:\d{2} /, ' ')
+                         .replace(" AM", " a.m.")
+                         .replace(" PM", " p.m.");
+
+    return formatted;
+}
+
+// виводити історію при виборі файлу
+document.getElementById("sidenav_selected_pdf").addEventListener("change", function() {
+    let selectedPdf = this.value;
+
+    fetch(`/get_chat_history?pdf_id=${selectedPdf}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const chatHistoryList = document.querySelector(".chat-history");
+        chatHistoryList.innerHTML = ""; // Очищуємо поточний список повідомлень
+
+        data.forEach(message => {
+            let formattedTimestamp = formatTimestamp(message.timestamp);
+            let messageItem = `
+                <li>
+                    <div class="text-center">
+                        <p>${formattedTimestamp}</p>
+                    </div>
+                    <div class="container user">
+                        <img src="{{ avatar_url }}" alt="Avatar">
+                        <p>${message.message}</p>
+                    </div>
+                    <div class="container darker">
+                        <img src="{% static 'chat_llm/img/iconX.png' %}" alt="Avatar" class="right">
+                        <p>${message.answer}</p>
+                    </div>
+                </li>
+            `;
+            chatHistoryList.innerHTML += messageItem;
+        });
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error.message);
+        // Додайте повідомлення про помилку для користувача, якщо це необхідно.
+        // Наприклад: alert('Sorry, there was a problem loading the chat history.');
+    });
+});
+</script>
+<script>
+    // повідомлення зникає через 5 сек
+    setTimeout(function(){
+        var alerts = document.querySelectorAll(".alert");
+        alerts.forEach(function(alert){
+            alert.style.display = "none";
+        });
+    }, 5000);
+</script>
+<script>
+    document.getElementById("questionForm").addEventListener("submit", function(event) {
+    var textInput = document.getElementById("textInput").value.trim();
+
+    if (!textInput) {
+        event.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please enter a message before sending.',
+            confirmButtonColor: '#3085d6',
+        });
+    }
+});
+
+</script>
 <script>
     // Отримуємо посилання на елемент контейнера
     var chatHistoryContainer = document.getElementById("chat-history-container");
-
     // Прокручуємо контейнер до нижнього краю
     chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
 </script>
