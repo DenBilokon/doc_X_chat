@@ -10,7 +10,7 @@ from .forms import RegisterForm, AvatarForm, UpdateUserForm
 from .models import Avatar
 from chat_llm.models import UserData
 
-from django.contrib.sites.shortcuts import get_current_site
+
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -37,8 +37,18 @@ class RegisterView(View):
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
+
             username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
+            password1 = form.cleaned_data.get('password1')
+
+            if len(username) < 5:
+                form.add_error('username', ValidationError("Username must be at least 5 characters long."))
+            if len(password1) < 8:
+                form.add_error('password1', ValidationError("Password must be at least 8 characters long."))
+
+            if form.errors:
+                return render(request, self.template_name, {'form': form})
 
             # Check if a user with this username already exists
             if get_user_model().objects.filter(username=username).exists():
@@ -79,6 +89,7 @@ class RegisterView(View):
             messages.success(request,
                              f"Hello {user.username}! Your account has been created. Please check your email to "
                              f"confirm your account.")
+
             return redirect(to="users:login")
         return render(request, self.template_name, {'form': form})
 
@@ -92,6 +103,22 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     subject_template_name = 'users/password_reset_subject.txt'
 
 
+def activate_account(request, uid, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uid))
+        user = get_user_model().objects.get(pk=uid)
+        if default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return render(request, 'users/account_activation_done.html')
+        else:
+            return render(request, 'users/account_activation_invalid.html')
+    except Exception as ex:
+        pass
+
+    return redirect(to="users:login")
+
+
 @login_required
 def profile(request):
     """
@@ -102,7 +129,9 @@ def profile(request):
     user_plan = UserData.objects.get(user=user)
     avatar = Avatar.objects.filter(user_id=user_id).first()
     return render(request, 'users/profile.html',
-                  context={'users': user, 'avatar': avatar, 'user_plan': user_plan})
+                  context={'users': user,
+                           'avatar': avatar,
+                           'user_plan': user_plan})
 
 
 @login_required
@@ -148,7 +177,8 @@ def upload_avatar(request):
             except (CloudinaryError, ValidationError) as e:
                 messages.warning(request, "Invalid file format.")
 
-    return render(request, 'users/user_upload_avatar.html', {'form': form, 'avatar': avatar})
+    return render(request, 'users/user_upload_avatar.html', {'form': form,
+                                                             'avatar': avatar})
 
 
 def signup_redirect(request):
@@ -160,20 +190,22 @@ def user_plan_subscription(request):
     user = request.user
     user_plan = UserData.objects.get(user=user)
     return render(request, 'users/user_plan_subscription.html',
-                  context={'users': user, 'user_plan': user_plan})
+                  context={'users': user,
+                           'user_plan': user_plan})
 
 
-def activate_account(request, uid, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uid))
-        user = get_user_model().objects.get(pk=uid)
-        if default_token_generator.check_token(user, token):
-            user.is_active = True
-            user.save()
-            return render(request, 'users/account_activation_done.html')
-        else:
-            return render(request, 'users/account_activation_invalid.html')
-    except Exception as ex:
-        pass
-
-    return redirect(to="users:login")
+def user_statistic(request):
+    user = request.user
+    user_data = UserData.objects.get(user=user)
+    max_questions_allowed = user_data.max_questions_allowed_for_plan()
+    max_files_allowed = user_data.max_files_allowed_for_plan()
+    width_questions = user_data.total_questions_asked / max_questions_allowed * 100
+    width_files = user_data.total_files_uploaded / max_files_allowed * 100
+    return render(request, 'users/user_statistic.html',
+                  context={'user': user,
+                           'user_data': user_data,
+                           "max_questions": max_questions_allowed,
+                           "max_files": max_files_allowed,
+                           "width_questions": width_questions,
+                           "width_files": width_files,
+                           })
