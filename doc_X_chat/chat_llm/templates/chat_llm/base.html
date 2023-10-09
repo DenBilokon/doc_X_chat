@@ -28,23 +28,6 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-
-                {% if user.is_superuser %}
-                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
-                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
-                    <hr class="d-lg-none my-2 text-white-50">
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/users_data">UserData</a>
-                </li>
-                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
-                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
-                    <hr class="d-lg-none my-2 text-white-50">
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin">Django Admin</a>
-                </li>
-                {% endif %}
                 {% if user.is_authenticated %}
                 <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
                     <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
@@ -109,6 +92,25 @@
 
                 {% endif %}
             </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/users_data">User Data</a>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Django Admin</a>
+                </li>
+                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-black"></div>
+                    <hr class="d-lg-none my-2 text-white-50">
+                </li>
+                {% endif %}
+            </ul>
             <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
@@ -124,11 +126,13 @@
                         {% endif %}
                     </a>
                     <div class="dropdown-menu" style="transform: translateX(-20px);">
-                        <a class="dropdown-item" href="/users/profile">Profile</a>
+                        <a class="dropdown-item" href="{% url 'users:profile' %}">Profile</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/users/user_plan_subscription">Change Plan</a>
+                        <a class="dropdown-item" href="{% url 'users:user_plan_subscription' %}">Change Plan</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/users/logout">Logout</a>
+                        <a class="dropdown-item" href="{% url 'users:user_statistic' %}">Personal usage</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'users:logout' %}">Logout</a>
                     </div>
                 </li>
                 {% else %}
@@ -158,13 +162,13 @@
         <!--                               rel="noopener noreferre">-->
         <!--                                <img src="https://s.dou.ua/assets/img/github.svg" width="25" height="25"></a>-->
         <!--                        </div>-->
-        <div class="fs-5 text-center">
-            <span class="big-text" style="font-size: 2em;">X</span> <span class="small-text"
-                                                                          style="font-size: 1em;">TEAM &copy; 2023</span>
+        <div class="text-center">
+            <span class="big-text" style="font-size: 1.2em;">X</span> <span class="small-text"
+                                                                          style="font-size: 0.8em;">TEAM &copy; 2023</span>
         </div>
     </div>
 </footer>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
@@ -180,17 +184,32 @@
 }
 
 
+
+
+
+
+
 </style>
 <style>
     .nav-link.dropdown-toggle {
         margin-right: 10x; /* Змініть значення за бажанням */
     }
 
+
+
+
+
+
 </style>
 <style>
     .nav-item {
         margin-right: 10px; /* Змініть значення за бажанням */
     }
+
+
+
+
+
 
 </style>
 </html>

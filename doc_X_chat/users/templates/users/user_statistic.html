@@ -1,0 +1,105 @@
+{% extends 'chat_llm/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8 text-center">
+            <h3>My usage</h3>
+            <br>
+            <br>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+    <div class="row">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+                <h5>Files</h5>
+                <br>
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8">
+            <div class="progress" role="progressbar" aria-label="Files Progress"
+                 aria-valuenow="{{ user_data.total_files_uploaded }}"
+                 aria-valuemin="0" aria-valuemax="{{ max_files }}">
+                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                     style="width: {{ width_files }}%">
+                </div>
+                <span class="progress-value">
+                    <h5>{{ user_data.total_files_uploaded }} / {{ max_files }}</h5>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+    <div class="row">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+                <br>
+                <br>
+                <br>
+                <br>
+                <h5>Questions</h5>
+                <br>
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8">
+            <div class="progress" role="progressbar" aria-label="Questions Progress"
+                 aria-valuenow="{{ user_data.total_questions_asked }}"
+                 aria-valuemin="0" aria-valuemax="{{ max_questions }}">
+                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                     style="width: {{ width_questions }}%">
+                </div>
+                <span class="progress-value">
+                    <h5>{{ user_data.total_questions_asked }} / {{ max_questions }}</h5>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+            <div class="d-grid gap-2">
+                <br>
+                <br>
+                <br>
+                <a href="{% url 'users:user_plan_subscription' %}" class="btn btn-lg" role="button"
+                   style="background-color: #048998; color: white;">Upgrade plan</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+        </div>
+    </div>
+</div>
+<style>
+    .progress {
+        height: 120px; /* Змініть це значення на бажаний розмір висоти */
+        background-color: #8ed2c9;
+        color: white;
+        text-align: center;
+    }
+
+
+
+
+</style>
+
+{% endblock %}
