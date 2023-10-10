@@ -318,7 +318,7 @@
             // Якщо у відповіді є ключ 'error', покажіть повідомлення користувачеві
             Swal.fire({
                 icon: 'error',
-                title: 'Помилка',
+                title: 'ERROR',
                 text: data.error,
             });
         } else {
@@ -330,8 +330,8 @@
         console.error('Помилка:', error);
         Swal.fire({
             icon: 'error',
-            title: 'Помилка',
-            text: 'Виникла невідома помилка. Спробуйте ще раз.',
+            title: 'Error',
+            text: 'Unknown error.Try again',
         });
     });
 }
