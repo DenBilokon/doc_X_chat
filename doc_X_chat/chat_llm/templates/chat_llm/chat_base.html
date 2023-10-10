@@ -8,7 +8,17 @@
 {% with selected_pdf_id=request.POST.selected_pdf|default:"" %}
 
 <div id="mySidenav" class="sidenav">
-
+    <!-- Повідомлення та помилки -->
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{form.non_field_errors}}
+        {{form.username.errors}}
+        {{form.password.errors}}
+    </div>
+    {% endif %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+    {% endfor %}
     <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
     <div class="text-center">
         <label style="color: white;" for="uploadForm" class="form-label mt-4">Update file:</label>
@@ -26,7 +36,6 @@
             <select class="form-select" id="sidenav_selected_pdf">
                 {% for pdf in user_pdfs %}
                 <option value="{{ pdf.id }}" {% if pdf.id|stringformat:"s" == selected_pdf_id %}selected{% endif %}>{{ pdf.title }}</option>
-
                 {% endfor %}
             </select>
         </div>
@@ -41,37 +50,26 @@
         {% endfor %}
     </div>
 </div>
-<!-- Повідомлення та помилки -->
-{% if form.errors %}
-<div class="alert alert-danger" role="alert">
-    {{form.non_field_errors}}
-    {{form.username.errors}}
-    {{form.password.errors}}
-</div>
-{% endif %}
-{% for message in messages %}
-<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-{% endfor %}
-
 <div class="container">
+
     <div id="main">
         <div class="chat-history-container" id="chat-history-container">
             <div class="chat-history">
                 <ul>
-
                     {% for message in chat_message %}
-
                     <li>
                         <div class="text-center">
-
                             <p>{{ message.timestamp }}</p>
                         </div>
-
                         <div class="container user">
+                            {% if avatar_url %}
                             <img src="{{ avatar_url }}" alt="Avatar">
+                            {% else %}
+                            <img src="https://i.pinimg.com/564x/a5/82/9a/a5829ac0d2b9d70943c41c6f48e5acea.jpg"
+                                 alt="Avatar">
+                            {% endif %}
                             <p>{{ message.message }}</p>
                         </div>
-
                         <div class="container darker">
                             <img src="{% static 'chat_llm/img/iconX.png' %}" alt="Avatar" class="right">
                             <p>{{ message.answer }}</p>
@@ -110,9 +108,29 @@
 </div>
 <style>
     .chat-history-container {
-    padding: 20px;
-    /* ... (інші стилі, які ви вже маєте) */
-}
+        max-height: calc(100vh - 2.7in); /* Встановлюємо максимальну висоту з урахуванням 3 см від низу */
+        overflow-y: auto; /* Додаємо прокрутку, якщо контент перевищує максимальну висоту */
+        width: 1500px;  /* встановіть потрібний відсоток або пікселі */
+        max-width: 900px;  /* якщо потрібно, можна також встановити максимальну ширину */
+        overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
+        border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
+        padding: 10px; /* Опціонально: додайте відступ для відокремлення */
+        background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
+        background-size: cover; /* Опціонально: встановіть розмір фону */
+        z-index: 0;
+        margin-left: 195px;
+        position: fixed;
+    }
+
+    .chat-history ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .chat-history li {
+        margin-bottom: 10px;
+    }
+
 .chat-history li {
     list-style-type: none;
 }
@@ -189,7 +207,7 @@
     align-items: center;
     padding: 5px 5px;
     background-color: #f5f5f5;
-    border: 1px solid #e0e0e0;
+    border: 2px solid #11999E;
     border-radius: 5px;
     width: 100%;
     max-width: 1100px;
@@ -237,13 +255,12 @@
 </style>
 
 <style>
-
     .sidenav {
     height: 100%;
     width: 250px; /* Зміна тут */
     position: fixed;
     z-index: 1;
-    top: 98px;
+    top: 88px;
     left: 0;
     background-color: rgba(7, 7, 7, 0.9); /* 0.9 - це рівень прозорості */
     overflow-x: hidden;
@@ -275,32 +292,6 @@
 
 </style>
 
-<style>
-
-    .chat-history-container {
-        max-height: calc(100vh - 2.7in); /* Встановлюємо максимальну висоту з урахуванням 3 см від низу */
-        overflow-y: auto; /* Додаємо прокрутку, якщо контент перевищує максимальну висоту */
-        width: 1500px;  /* встановіть потрібний відсоток або пікселі */
-        max-width: 800px;  /* якщо потрібно, можна також встановити максимальну ширину */
-        overflow-y: scroll; /* Увімкніть вертикальну прокрутку, коли вміст перевищує висоту контейнера */
-        border: 1px solid rgba(0, 0, 0, 0.2); /* Встановіть рамку з прозорістю (rgba) */
-        padding: 10px; /* Опціонально: додайте відступ для відокремлення */
-        background-color: rgba(255, 255, 255, 0.9); /* 0.9 - це рівень прозорості фону */
-        background-size: cover; /* Опціонально: встановіть розмір фону */
-        z-index: 0;
-        margin-left: 250px;
-        position: fixed;
-    }
-
-    .chat-history ul {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    .chat-history li {
-        margin-bottom: 10px;
-    }
-</style>
 <!-- JavaScript goes at the end -->
 <script>
     function submitForm() {
@@ -406,7 +397,11 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
                         <p>${formattedTimestamp}</p>
                     </div>
                     <div class="container user">
+                        {% if avatar_url %}
                         <img src="{{ avatar_url }}" alt="Avatar">
+                        {% else %}
+                        <img src="https://i.pinimg.com/564x/a5/82/9a/a5829ac0d2b9d70943c41c6f48e5acea.jpg" alt="Avatar">
+                        {% endif %}
                         <p>${message.message}</p>
                     </div>
                     <div class="container darker">
