@@ -9,8 +9,8 @@ def main():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "doc_X_chat.settings")
     try:
         from django.core.management import execute_from_command_line
-    except ImportError as exc:
-        raise ImportError("Couldn't import Django.") from exc
+    except ImportError:
+        raise ImportError("Couldn't import Django.")
     execute_from_command_line(sys.argv)
 
 
