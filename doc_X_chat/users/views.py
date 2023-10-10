@@ -104,6 +104,16 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
 
 
 def activate_account(request, uid, token):
+    """
+    The activate_account function is responsible for activating a user's account.
+        It takes in two parameters: request and uidb64, token. The request parameter is the HTTP GET Request object that contains information about the current HTTP request.
+        The uidb64 parameter is a string representation of an integer that has been base 64 encoded to protect it from being tampered with by malicious users who may try to change its value in order to activate another user's account instead of their own.
+    
+    :param request: Get the request object
+    :param uid: Decode the uidb64 value in the url
+    :param token: Check if the user is valid
+    :return: A render() function, which is a httpresponse object
+    """
     try:
         uid = force_str(urlsafe_base64_decode(uid))
         user = get_user_model().objects.get(pk=uid)
@@ -123,6 +133,9 @@ def activate_account(request, uid, token):
 def profile(request):
     """
     The profile function is used to render the profile page of a users.
+    
+    :param request: Get the current user
+    :return: The user, avatar and user_plan
     """
     user = request.user
     user_id = request.user.id
@@ -136,6 +149,13 @@ def profile(request):
 
 @login_required
 def update_user(request):
+    """
+    The update_user function is used to update the user's profile.
+        The function takes in a request and returns a render of the users/profile.html page with an UpdateUserForm instance.
+    
+    :param request: Get the current user
+    :return: A render method that renders the profile page with the form
+    """
     if request.method == 'POST':
         form = UpdateUserForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -152,6 +172,9 @@ def update_user(request):
 def upload_avatar(request):
     """
     The upload_avatar function allows a users to upload an avatar image.
+    
+    :param request: Get the request object, which contains information about the current web request
+    :return: A render function that renders the user_upload_avatar.html page with the form and avatar
     """
     avatar = Avatar.objects.filter(user_id=request.user.id).first()
     form = AvatarForm()  # Instantiate the form
@@ -182,11 +205,27 @@ def upload_avatar(request):
 
 
 def signup_redirect(request):
+    """
+    The signup_redirect function redirects the user to the home page if they try to sign up with an email that is already in use.
+    
+    :param request: The request sent by the user
+    :return: A redirect to the home page
+    """
     messages.error(request, "Something wrong here, it may be that you already have account!")
     return redirect(to='chat_llm:home')
 
 
 def user_plan_subscription(request):
+    """
+    The user_plan_subscription function is used to render the user_plan_subscription.html template,
+    which displays a form that allows users to subscribe to a plan. The function takes in the request object as an argument,
+    and returns the rendered user_plan_subscription.html template with context variables for 'users' and 'user_plan'.
+    The 'users' variable contains all of the information about a particular User instance (i.e., username, email address), 
+    while the 'user_plan' variable contains all of the information about a particular UserData instance (i.e., plan). 
+    
+    :param request: Get the user data from the database
+    :return: The user_plan_subscription.html page with the user and user_plan
+    """
     user = request.user
     user_plan = UserData.objects.get(user=user)
     return render(request, 'users/user_plan_subscription.html',
@@ -195,6 +234,13 @@ def user_plan_subscription(request):
 
 
 def user_statistic(request):
+    """
+    The user_statistic function is used to display the user's statistics.
+        The function takes in a request object and returns a rendered template of the user_statistic.html page with context data.
+    
+    :param request: Get the user object from the request
+    :return: A rendered template of the user_statistic.html page with context data
+    """
     user = request.user
     user_data = UserData.objects.get(user=user)
     max_questions_allowed = user_data.max_questions_allowed_for_plan()

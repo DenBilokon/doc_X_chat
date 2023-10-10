@@ -5,7 +5,11 @@ import sys
 
 
 def main():
-    """Run administrative tasks."""
+    """
+    The main function is used to run administrative tasks.
+    
+    :return: The value returned by the execute_from_command_line() function
+    """
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "doc_X_chat.settings")
     try:
         from django.core.management import execute_from_command_line
