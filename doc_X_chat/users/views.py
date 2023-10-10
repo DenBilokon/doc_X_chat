@@ -72,13 +72,13 @@ class RegisterView(View):
 
             # Get current site domain
             # !!!!!!!!!!!!!!! додати домен !!!!!!!!!!!!!!!!!!!
-            domain = get_current_site(request).domain
+            # domain = get_current_site(request).domain
 
             # Prepare email text
             mail_subject = 'Activate your account'
             message = render_to_string('users/account_activation_email.html', {
                 'user': user,
-                'domain': domain,
+                'domain': "127.0.0.1",
                 'uid': uid,
                 'token': token,
             })
