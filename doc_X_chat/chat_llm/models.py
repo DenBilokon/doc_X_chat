@@ -64,6 +64,15 @@ class UserData(models.Model):
     max_questions_allowed_ultra = 2000
 
     def max_files_allowed_for_plan(self):
+        """
+        The max_files_allowed_for_plan function returns the maximum number of files allowed for a given plan.
+            If the user is on a free plan, it will return max_files_allowed_free.
+            If the user is on a gold plan, it will return max_files_allowed_gold.
+            If the user is on an ultra plan, it will return max_files__allowed__ultra.
+        
+        :param self: Represent the instance of the class
+        :return: The max_files_allowed value for the plan that the user is subscribed to
+        """
         if self.subscribe_plan == 'free':
             return self.max_files_allowed_free
         elif self.subscribe_plan == 'gold':
@@ -72,6 +81,13 @@ class UserData(models.Model):
             return self.max_files_allowed_ultra
 
     def max_questions_allowed_for_plan(self):
+        """
+        The max_questions_allowed_for_plan function returns the maximum number of questions allowed for a given plan.
+            The function takes no arguments and returns an integer.
+        
+        :param self: Represent the instance of the class
+        :return: The maximum number of questions allowed for each plan
+        """
         if self.subscribe_plan == 'free':
             return self.max_questions_allowed_free
         elif self.subscribe_plan == 'gold':

@@ -16,7 +16,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 
 
-from PyPDF2 import PdfFileReader, PdfReader
+from PyPDF2 import PdfFileReader
 from pptx import Presentation
 from .forms import PDFUploadForm, PDFUpdateForm, PDFDocumentForm2
 from .models import ChatMessage, PDFDocument, UserData
@@ -25,6 +25,12 @@ load_dotenv()
 
 
 def main(request):
+    """
+    The main function is the entry point for the chat_llm app.
+    
+    :param request: Get information about the user who is currently logged in
+    :return: A render of the index
+    """
     # avatar = Avatar.objects.filter(user_id=request.user.id).first()
     return render(request, 'chat_llm/index.html', context={})
 
@@ -42,7 +48,7 @@ def get_pdf_text(file):
             temp_file.write(file.read())
             temp_file.flush()
             if file.name.endswith('.pdf'):
-                pdf_reader = PdfReader(temp_file.name)
+                pdf_reader = PdfFileReader(temp_file.name)
                 text = ''.join(page.extract_text() for page in pdf_reader.pages)
             elif file.name.endswith('.txt'):
                 with open(temp_file.name, 'r') as f:
@@ -225,6 +231,12 @@ def ask_question(request):
 
 @login_required(login_url="/login/")
 def get_chat_history(request):
+    """
+    The get_chat_history function returns a JSON response containing the chat history for a given PDF document.
+    
+    :param request: Get the request object
+    :return: A list of dictionaries containing the chat history for a given PDF document
+    """
     pdf_id = request.GET.get('pdf_id')
     if not pdf_id:
         return JsonResponse({"error": "PDF ID not provided"}, status=400)
