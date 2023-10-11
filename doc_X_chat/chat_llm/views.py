@@ -155,6 +155,7 @@ def upload_pdf(request):
             pdf = PDFDocument(user=user, title=pdf_document.name)
             pdf.documentContent = get_pdf_text(pdf_document)
             pdf.save()
+            return JsonResponse({'success': 'File uploaded successfully.'})
 
     else:
         form = PDFUploadForm()

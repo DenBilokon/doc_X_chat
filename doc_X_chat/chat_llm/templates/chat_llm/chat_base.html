@@ -305,18 +305,19 @@
     })
     .then(response => response.json())  // Перетворюємо відповідь у JSON
     .then(data => {
-        if (data.error) {
-            // Якщо у відповіді є ключ 'error', покажіть повідомлення користувачеві
-            Swal.fire({
-                icon: 'error',
-                title: 'ERROR',
-                text: data.error,
-            });
-        } else {
-            // Обробляємо успішну відповідь (наприклад, перезавантаження сторінки або показування підтвердження)
-            location.reload();
-        }
-    })
+    if (data.error) {
+        // Якщо у відповіді є ключ 'error', покажіть повідомлення користувачеві
+        Swal.fire({
+            icon: 'error',
+            title: 'ERROR',
+            text: data.error,
+        });
+    } else if (data.success) {
+        // Обробляємо успішну відповідь (наприклад, перезавантаження сторінки)
+        location.reload();
+    }
+})
+
     .catch(error => {
         console.error('Помилка:', error);
         Swal.fire({
