@@ -7,10 +7,24 @@ from chat_llm.models import UserData
 
 
 def is_admin(user):
+    """
+    The is_admin function checks if the user is authenticated and a superuser.
+        
+    
+    :param user: Check if the user is authenticated and a superuser
+    :return: True if the user is authenticated and a superuser
+    """
     return user.is_authenticated and user.is_superuser
 
 
 def get_user_data(user_id):
+    """
+    The get_user_data function takes a user_id as an argument and returns the UserData object associated with that user.
+    If no such object exists, it returns None.
+    
+    :param user_id: Get the user data for a specific user
+    :return: A userdata object or none
+    """
     try:
         user_data = UserData.objects.get(user=user_id)
     except UserData.DoesNotExist:
@@ -21,6 +35,12 @@ def get_user_data(user_id):
 
 @user_passes_test(is_admin)
 def get_all_users_data(request):
+    """
+    The get_all_users_data function is responsible for retrieving all users data and rendering it in the admin_console/users_data.html template.
+    
+    :param request: Get the request object
+    :return: A list of dictionaries
+    """
     # Ось ваша поточна логіка функції
     current_time = timezone.now()
     users_all_data = User.objects.all()
@@ -48,6 +68,14 @@ def get_all_users_data(request):
 
 
 def format_duration(duration):
+    """
+    The format_duration function takes a timedelta object and returns a string
+    representing the duration in days and hours.
+    
+    
+    :param duration: Pass in the timedelta object
+    :return: A string that contains the number of days and hours in the duration
+    """
     days = duration.days
     hours = duration.seconds // 3600
     return f"{days} days, {hours} hours"
