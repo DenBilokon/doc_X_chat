@@ -9,16 +9,16 @@
 
 <div id="mySidenav" class="sidenav">
     <!-- Повідомлення та помилки -->
-    {% if form.errors %}
-    <div class="alert alert-danger" role="alert">
-        {{form.non_field_errors}}
-        {{form.username.errors}}
-        {{form.password.errors}}
-    </div>
-    {% endif %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-    {% endfor %}
+<!--    {% if form.errors %}-->
+<!--    <div class="alert alert-danger" role="alert">-->
+<!--        {{form.non_field_errors}}-->
+<!--        {{form.username.errors}}-->
+<!--        {{form.password.errors}}-->
+<!--    </div>-->
+<!--    {% endif %}-->
+<!--    {% for message in messages %}-->
+<!--    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>-->
+<!--    {% endfor %}-->
     <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
     <div class="text-center">
         <label style="color: white;" for="uploadForm" class="form-label mt-4">Update file:</label>
