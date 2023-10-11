@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, SetPasswordForm
 from django.contrib.auth.models import User
 from django.forms import ModelForm, ClearableFileInput
@@ -33,6 +34,19 @@ class RegisterForm(UserCreationForm):
         fields = ["username", "first_name", "last_name", "email", "password1", "password2"]
 
 
+# class LoginForm(AuthenticationForm):
+#     username = forms.CharField(max_length=50, required=True,
+#                                widget=forms.TextInput({'class': 'form-control',
+#                                                        'placeholder': 'username'}))
+#     password = forms.CharField(max_length=50, min_length=5, required=True,
+#                                widget=forms.PasswordInput({'class': 'form-control',
+#                                                            'placeholder': 'password'}))
+#
+#     class Meta:
+#         model = User
+#         fields = ["username", "password"]
+
+
 class LoginForm(AuthenticationForm):
     username = forms.CharField(max_length=50, required=True,
                                widget=forms.TextInput({'class': 'form-control',
@@ -41,9 +55,17 @@ class LoginForm(AuthenticationForm):
                                widget=forms.PasswordInput({'class': 'form-control',
                                                            'placeholder': 'password'}))
 
-    class Meta:
-        model = User
-        fields = ["username", "password"]
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get("username")
+        password = cleaned_data.get("password")
+
+        # Перевірка чи користувач існує і чи пароль вірний
+        user = authenticate(username=username, password=password)
+        if user is None:
+            raise forms.ValidationError("Невірне ім'я користувача або пароль.")
+
+        return cleaned_data
 
 
 class AvatarForm(ModelForm):

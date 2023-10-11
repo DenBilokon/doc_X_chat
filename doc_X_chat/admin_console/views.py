@@ -30,8 +30,11 @@ def get_all_users_data(request):
 
     for user in users_all_data:
         user_data = get_user_data(user.id)
-        time_since_last_login = current_time - user.last_login
-        time_since_last_login = format_duration(time_since_last_login)
+        if user.last_login:
+            time_since_last_login = current_time - user.last_login
+            time_since_last_login = format_duration(time_since_last_login)
+        else:
+            time_since_last_login = "Never logged in"
         # Створюємо словник із даними користувача
         user_summary = {
             'user': user,

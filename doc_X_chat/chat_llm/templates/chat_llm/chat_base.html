@@ -8,17 +8,17 @@
 {% with selected_pdf_id=request.POST.selected_pdf|default:"" %}
 
 <div id="mySidenav" class="sidenav">
-    <!-- Повідомлення та помилки -->
-    {% if form.errors %}
-    <div class="alert alert-danger" role="alert">
-        {{form.non_field_errors}}
-        {{form.username.errors}}
-        {{form.password.errors}}
-    </div>
-    {% endif %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-    {% endfor %}
+<!--    &lt;!&ndash; Повідомлення та помилки &ndash;&gt;-->
+<!--    {% if form.errors %}-->
+<!--    <div class="alert alert-danger" role="alert">-->
+<!--        {{form.non_field_errors}}-->
+<!--        {{form.username.errors}}-->
+<!--        {{form.password.errors}}-->
+<!--    </div>-->
+<!--    {% endif %}-->
+<!--    {% for message in messages %}-->
+<!--    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>-->
+<!--    {% endfor %}-->
     <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
     <div class="text-center">
         <label style="color: white;" for="uploadForm" class="form-label mt-4">Update file:</label>
@@ -112,13 +112,13 @@
     overflow-y: auto;
     width: 1500px;
     max-width: 900px;
+    margin-left: 197px;
     height: calc(100vh - 2.7in);
     border: 1px solid #11999E;
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     background-size: cover;
     z-index: 0;
-    margin-left: 197px;
     position: fixed;
     border-radius: 10px; /* Заокруглі кути для сучасного вигляду */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Тінь для піднятого вигляду */
@@ -126,6 +126,15 @@
     /* Кастомна прокрутка */
     scrollbar-width: thin; /* для Firefox */
     scrollbar-color: rgba(155, 155, 155, 0.7) rgba(255, 255, 255, 0.3); /* колір прокрутки та колір трека для Firefox */
+}
+
+/* Стилі для мобільних пристроїв (наприклад, менше 768px) */
+@media screen and (max-width: 768px) {
+    .chat-history-container {
+        width: 100%;       /* Займає 100% ширини екрану */
+        margin-left: 0;    /* Відміна зліва */
+        padding: 5px;      /* Зменшуємо відступи для мобільних пристроїв */
+    }
 }
 
 /* Для веб-браузерів на основі WebKit (Chrome, Safari) */
@@ -278,7 +287,7 @@
     width: 250px; /* Зміна тут */
     position: fixed;
     z-index: 1;
-    top: 90px;
+    top: 98px;
     left: 0;
     background-color: rgba(7, 7, 7, 0.9); /* 0.9 - це рівень прозорості */
     overflow-x: hidden;
