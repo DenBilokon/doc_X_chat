@@ -31,10 +31,8 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost",
-]
+# ALLOWED_HOSTS = ["*", "localhost", "127.0.0.1", "0.0.0.0"]
+# CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://0.0.0.0']
 # Application definition
 
 INSTALLED_APPS = [
@@ -129,7 +127,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',  # Авторизація через django-allauth
 )
 
-SITE_ID = 5
+SITE_ID = 6
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 

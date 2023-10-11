@@ -393,3 +393,55 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
 {% endwith %}
 
 {% endblock %}
+
+<style>
+/* Стилі для форми, яка прикріплена до низу */
+
+#ask-form {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f9f9f9;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.form-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+/* Кнопка справа від поля вводу */
+
+.input-group {
+    position: relative;
+    width: 100%;
+    max-width: 800px; /* Збільшена довжина поля вводу */
+}
+
+.input-group-prepend {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+.btn {
+    margin-left: 10px; /* Змінено з margin-right на margin-left */
+}
+
+.form-control {
+    padding-right: 40px; /* Додаємо відступ справа для текстового поля, замість відступу зліва */
+}
+
+/* Стилі для зображення в кнопці */
+
+.input-group img {
+    max-height: 20px;
+}
+
+</style>
