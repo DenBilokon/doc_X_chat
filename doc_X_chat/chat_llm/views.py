@@ -172,47 +172,59 @@ def ask_question(request):
     :param request: HTTP request.
     :return: Rendered page with the response.
     """
-    user = request.user
-
     try:
-        user_data = UserData.objects.get(user=user)
-    except UserData.DoesNotExist:
-        # Обробка ситуації, коли відсутній запис UserData для користувача.
-        # Можна створити запис за замовчуванням тут.
-        user_data = UserData.objects.create(user=user, subscribe_plan='free', total_files_uploaded=0,
-                                            total_questions_asked=0)
+        user = request.user
 
-    max_questions_allowed = user_data.max_questions_allowed_for_plan()
+        try:
+            user_data = UserData.objects.get(user=user)
+        except UserData.DoesNotExist:
+            # Обробка ситуації, коли відсутній запис UserData для користувача.
+            # Можна створити запис за замовчуванням тут.
+            user_data = UserData.objects.create(user=user, subscribe_plan='free', total_files_uploaded=0,
+                                                total_questions_asked=0)
 
-    chat_history = ChatMessage.objects.filter(user=request.user).order_by(
-        'timestamp')[:10]
-    chat_response = ''
-    user_pdfs = PDFDocument.objects.filter(user=request.user)
-    user_question = ""
-    selected_pdf = None  # Змінено з selected_pdf_id на об'єкт PDFDocument
+        max_questions_allowed = user_data.max_questions_allowed_for_plan()
 
-    if request.method == 'POST':
-        # Check if the user has exceeded the limit for questions per file
-        if user_data.total_questions_asked >= max_questions_allowed:
-            return JsonResponse({'error': 'You have reached the limit for questions.'}, status=400)
-        else:
-            user_question = request.POST.get('user_question')
-            selected_pdf_id = request.POST.get('selected_pdf')
-            selected_pdf = get_object_or_404(PDFDocument, id=selected_pdf_id)
-            text_chunks = get_text_chunks(selected_pdf.documentContent)
+        chat_history = ChatMessage.objects.filter(user=request.user).order_by(
+            'timestamp')[:10]
+        chat_response = ''
+        user_pdfs = PDFDocument.objects.filter(user=request.user)
+        user_question = ""
+        selected_pdf = None  # Змінено з selected_pdf_id на об'єкт PDFDocument
 
-            knowledge_base = get_vectorstore(text_chunks)
-            conversation_chain = get_conversation_chain(knowledge_base)
+        if request.method == 'POST':
+            # Check if the user has exceeded the limit for questions per file
+            if user_data.total_questions_asked >= max_questions_allowed:
+                return JsonResponse({'error': 'You have reached the limit for questions.'}, status=400)
+            else:
+                user_question = request.POST.get('user_question')
+                selected_pdf_id = request.POST.get('selected_pdf')
+                selected_pdf = get_object_or_404(PDFDocument, id=selected_pdf_id)
+                text_chunks = get_text_chunks(selected_pdf.documentContent)
 
-            with get_openai_callback() as cb:
-                response = conversation_chain({'question': user_question})
+                knowledge_base = get_vectorstore(text_chunks)
+                conversation_chain = get_conversation_chain(knowledge_base)
 
-            chat_response = response["answer"]
-            chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
-                                       pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
-            user_data.total_questions_asked += 1
-            user_data.save()
-            chat_message.save()
+                with get_openai_callback() as cb:
+                    response = conversation_chain({'question': user_question})
+
+                chat_response = response["answer"]
+                chat_message = ChatMessage(user=request.user, message=user_question, answer=chat_response,
+                                           pdf_document=selected_pdf)  # Передаємо об'єкт PDFDocument
+                user_data.total_questions_asked += 1
+                user_data.save()
+                chat_message.save()
+    except MemoryError as e:
+        # Обробити MemoryError тут
+        error_message = ("Недостатньо пам'яті на безкоштовному сервісі Fjy.io для обробки запиту. "
+                         "Спробуйте розгорнути локально з скрипту на GitHub.")
+        context = {'error_message': error_message}
+        return render(request, 'chat_llm/chat_base.html', context)
+    except Exception as e:
+        # Обробка інших винятків
+        error_message = f"Сталася помилка: {str(e)}"
+        context = {'error_message': error_message}
+        return render(request, 'chat_llm/chat_base.html', context)
 
     # Отримуємо повідомлення, які відносяться до обраного PDFDocument
     chat_message = ChatMessage.objects.filter(user=request.user, pdf_document=selected_pdf).order_by('timestamp')

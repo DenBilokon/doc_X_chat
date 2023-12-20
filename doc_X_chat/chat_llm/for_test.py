@@ -1,7 +1,4 @@
-from dotenv import load_dotenv
+from random import random
 
-load_dotenv()
-import os
-
-api_key = os.getenv("OPENAI_API_KEY")
+print(str(random())[2:])
 

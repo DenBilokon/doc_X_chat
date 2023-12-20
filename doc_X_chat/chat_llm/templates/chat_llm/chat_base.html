@@ -8,17 +8,7 @@
 {% with selected_pdf_id=request.POST.selected_pdf|default:"" %}
 
 <div id="mySidenav" class="sidenav">
-<!--    &lt;!&ndash; Повідомлення та помилки &ndash;&gt;-->
-<!--    {% if form.errors %}-->
-<!--    <div class="alert alert-danger" role="alert">-->
-<!--        {{form.non_field_errors}}-->
-<!--        {{form.username.errors}}-->
-<!--        {{form.password.errors}}-->
-<!--    </div>-->
-<!--    {% endif %}-->
-<!--    {% for message in messages %}-->
-<!--    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>-->
-<!--    {% endfor %}-->
+
     <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
     <div class="text-center">
         <label style="color: white;" for="uploadForm" class="form-label mt-4">Update file:</label>
@@ -108,49 +98,42 @@
 </div>
 <style>
     .chat-history-container {
-    max-height: calc(100vh - 2.7in);
-    overflow-y: auto;
-    width: 1500px;
-    max-width: 900px;
-    margin-left: 197px;
-    height: calc(100vh - 2.7in);
-    border: 1px solid #11999E;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
-    background-size: cover;
-    z-index: 0;
-    position: fixed;
-    border-radius: 10px; /* Заокруглі кути для сучасного вигляду */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Тінь для піднятого вигляду */
+        max-height: calc(100vh - 2.4in);
+        overflow-y: auto;
+        width: 1000px;
+        max-width: 80%;
+        left: 50%; /* Відцентрування по горизонталі */
+        transform: translateX(-50%); /* Зсув вліво на 50% власної ширини, щоб він центрувався горизонтально */
+        height: calc(100vh - 2.4in);
+        border: 1px solid #11999E;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        background-size: cover;
+        z-index: 0;
+        position: fixed;
+        border-radius: 10px; /* Заокруглі кути для сучасного вигляду */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Тінь для піднятого вигляду */
 
-    /* Кастомна прокрутка */
-    scrollbar-width: thin; /* для Firefox */
-    scrollbar-color: rgba(155, 155, 155, 0.7) rgba(255, 255, 255, 0.3); /* колір прокрутки та колір трека для Firefox */
-}
-
-/* Стилі для мобільних пристроїв (наприклад, менше 768px) */
-@media screen and (max-width: 768px) {
-    .chat-history-container {
-        width: 100%;       /* Займає 100% ширини екрану */
-        margin-left: 0;    /* Відміна зліва */
-        padding: 5px;      /* Зменшуємо відступи для мобільних пристроїв */
+        /* Кастомна прокрутка */
+        scrollbar-width: thin; /* для Firefox */
+        scrollbar-color: rgba(155, 155, 155, 0.7) rgba(255, 255, 255, 0.3); /* колір прокрутки та колір трека для Firefox */
     }
-}
 
-/* Для веб-браузерів на основі WebKit (Chrome, Safari) */
-.chat-history-container::-webkit-scrollbar {
-    width: 8px; /* Ширина прокрутки */
-}
 
-.chat-history-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.3); /* Колір трека прокрутки */
-}
+    /* Для веб-браузерів на основі WebKit (Chrome, Safari) */
+    .chat-history-container::-webkit-scrollbar {
+        width: 8px; /* Ширина прокрутки */
+    }
 
-.chat-history-container::-webkit-scrollbar-thumb {
-    background-color: rgba(155, 155, 155, 0.7); /* Колір самої прокрутки */
-    border-radius: 20px; /* Заокруглені кути на прокрутці */
-    border: 3px solid rgba(255, 255, 255, 0.3); /* Отвір по центру прокрутки */
-}
+    .chat-history-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.3); /* Колір трека прокрутки */
+    }
+
+    .chat-history-container::-webkit-scrollbar-thumb {
+        background-color: rgba(155, 155, 155, 0.7); /* Колір самої прокрутки */
+        border-radius: 20px; /* Заокруглені кути на прокрутці */
+        border: 3px solid rgba(255, 255, 255, 0.3); /* Отвір по центру прокрутки */
+    }
 
 
     .chat-history ul {
@@ -162,18 +145,18 @@
         margin-bottom: 10px;
     }
 
-.chat-history li {
-    list-style-type: none;
-}
+    .chat-history li {
+        list-style-type: none;
+    }
 
     /* Chat containers */
-.container.user {
-    border: 2px solid #dedede;
-    background-color: #f1f1f1;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px 0;
-}
+    .container.user {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
 
     /* Darker chat container */
     .darker {
@@ -221,104 +204,78 @@
     }
 </style>
 <style>
-    /* Стилі для форми, яка прикріплена до низу */
-
-    #ask-form {
-    position: fixed;
-    bottom: 0;
-    left: 50%;  /* Відцентрування по горизонталі */
-    transform: translateX(-50%);  /* Зсув вліво на 50% власної ширини, щоб він центрувався горизонтально */
-    z-index: 1000;
-    padding: 50px;
-    width: 1000px;
-}
-
-.form-box {
-    justify-content: flex-start;
-    align-items: center;
-    padding: 5px 5px;
-    background-color: #f5f5f5;
-    border: 1px solid #11999E;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 1100px;
-
-}
-
-    .form-box .form-control {
-        width: 100%;
-        padding: 8px 15px;
-        margin-left: 0px;
-        border-radius: 5px;
-    }
-
-    /* Кнопка справа від поля вводу */
-
-    .input-group {
-        position: relative;
-        width: 100%;
-        max-width: 1000px; /* Збільшена довжина поля вводу */
-    }
-
-    .input-group-prepend {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        display: flex;
+    /* Стилі для форми Input */
+    .form-box {
+        justify-content: flex-start;
         align-items: center;
-    }
-
-    .form-control {
-        padding-right: 20px; /* Додаємо відступ справа для текстового поля, замість відступу зліва */
-    }
-
-    /* Стилі для зображення в кнопці */
-
-    .input-group img {
-        max-height: 20px;
+        padding: 5px 5px; /* Змінено значення padding для зручності */
+        background-color: #f5f5f5;
+        border: 1px solid #11999E;
+        border-radius: 5px;
+        width: 1000px;
+        max-width: 80%;
+        position: fixed;
+        bottom: 35px; /* Змінено значення bottom для підняття вище */
+        transform: translateX(-50%);
+        z-index: 0;
+        left: 50%;
     }
 
 </style>
 
 <style>
     .sidenav {
-    height: 100%;
-    width: 250px; /* Зміна тут */
-    position: fixed;
-    z-index: 1;
-    top: 98px;
-    left: 0;
-    background-color: rgba(7, 7, 7, 0.9); /* 0.9 - це рівень прозорості */
-    overflow-x: hidden;
-    transition: 0.5s;
-    padding-top: 60px;
-}
+        height: 100%;
+        width: 250px; /* Зміна тут */
+        position: fixed;
+        z-index: 1;
+        top:76px;
+        left: 0;
+        background-color: rgba(7, 7, 7, 0.9); /* 0.9 - це рівень прозорості */
+        overflow-x: hidden;
+        transition: 0.1s;
+        padding-top: 60px;
+    }
 
+    .sidenav a {
+        padding: 10px 15px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
 
-.sidenav a {
-    padding: 10px 15px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-}
+    .sidenav a:hover {
+        color: #f1f1f1;
+    }
 
-.sidenav a:hover {
-    color: #f1f1f1;
-}
-
-.sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-}
+    .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
 
 </style>
+<script>
+    // Function to close the menu
+    function closeMenu() {
+        var sidenav = document.getElementById("mySidenav");
+        sidenav.style.width = "0";
+        document.getElementById("main").style.marginLeft = "0";
+    }
 
+    // Execute the closeMenu function when the page has finished loading
+    document.addEventListener("DOMContentLoaded", function() {
+        closeMenu();
+    });
+
+    // Rest of your existing script...
+    // ...
+
+</script>
 <!-- JavaScript goes at the end -->
 <script>
     function submitForm() {
@@ -470,9 +427,21 @@ document.getElementById("sidenav_selected_pdf").addEventListener("change", funct
             confirmButtonColor: '#3085d6',
         });
     }
+// ############################  ВИДАЛИТИ ЩОБ НАДСИЛАТИ ПОВІДОМЛЕННЯ  ####################################
+    if (textInput) {
+        event.preventDefault();
+        Swal.fire({
+        icon: 'error',
+        title: 'Вибачте...',
+        text: 'Наразі чат тимчасово недоступний через обмежені ресурси на безкоштовному Fly.io. Ми ведемо роботу над вирішенням цього питання для покращення обслуговування. Ви можете слідкувати за оновленнями та перевіряти стан чату на нашому [GitHub репозиторії](https://github.com/DenBilokon/doc_X_chat), де доступний вихідний код. Дякуємо за розуміння!',
+        confirmButtonColor: '#3085d6',
+    });
+    }
+// ######################################################################################################
 });
 
 </script>
+
 <script>
     // Отримуємо посилання на елемент контейнера
     var chatHistoryContainer = document.getElementById("chat-history-container");

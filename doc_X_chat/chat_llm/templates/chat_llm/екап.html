@@ -1,0 +1,152 @@
+<style>
+    .chat-history-container {
+        max-height: calc(100vh - 2.5in);
+        overflow-y: auto;
+        width: 1000px;
+        max-width: 80%;
+        left: 50%; /* Відцентрування по горизонталі */
+        transform: translateX(-50%); /* Зсув вліво на 50% власної ширини, щоб він центрувався горизонтально */
+        height: calc(100vh - 2.5in);
+        border: 1px solid #11999E;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        background-size: cover;
+        z-index: 0;
+        position: fixed;
+        border-radius: 10px; /* Заокруглі кути для сучасного вигляду */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Тінь для піднятого вигляду */
+
+        /* Кастомна прокрутка */
+        scrollbar-width: thin; /* для Firefox */
+        scrollbar-color: rgba(155, 155, 155, 0.7) rgba(255, 255, 255, 0.3); /* колір прокрутки та колір трека для Firefox */
+    }
+
+
+    /* Для веб-браузерів на основі WebKit (Chrome, Safari) */
+    .chat-history-container::-webkit-scrollbar {
+        width: 8px; /* Ширина прокрутки */
+    }
+
+    .chat-history-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.3); /* Колір трека прокрутки */
+    }
+
+    .chat-history-container::-webkit-scrollbar-thumb {
+        background-color: rgba(155, 155, 155, 0.7); /* Колір самої прокрутки */
+        border-radius: 20px; /* Заокруглені кути на прокрутці */
+        border: 3px solid rgba(255, 255, 255, 0.3); /* Отвір по центру прокрутки */
+    }
+
+
+    .chat-history ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .chat-history li {
+        margin-bottom: 10px;
+    }
+
+    .chat-history li {
+        list-style-type: none;
+    }
+
+    /* Chat containers */
+    .container.user {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Darker chat container */
+    .darker {
+        border-color: #ccc;
+        background-color: #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+    }
+
+    /* Clear floats */
+    .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Style images */
+    .container img {
+        float: left;
+        max-width: 40px;
+
+        margin-right: 20px;
+        border-radius: 20%;
+    }
+
+    /* Style the right image */
+    .container img.right {
+        float: right;
+        max-width: 40px;
+        margin-left: 20px;
+        margin-right:0;
+    }
+
+    /* Style time text */
+    .time-right {
+        float: right;
+        color: #aaa;
+    }
+
+    /* Style time text */
+    .time-left {
+        float: left;
+        color: #999;
+    }
+</style>
+<style>
+    /* Стилі для форми Input */
+
+
+    .form-box {
+        justify-content: flex-start;
+        align-items: center;
+        padding: 5px 5px; /* Змінено значення padding для зручності */
+        background-color: #f5f5f5;
+        border: 1px solid #11999E;
+        border-radius: 5px;
+        width: 1000px;
+        max-width: 80%;
+        position: fixed;
+        bottom: 40px; /* Змінено значення bottom для підняття вище */
+        transform: translateX(-50%);
+        z-index: 1000;
+        left: 50%;
+    }
+
+    .input-group {
+        position: relative;
+        width: 100%;
+        max-width: 900px; /* Збільшена довжина поля вводу */
+
+    .input-group-prepend {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-control {
+        padding-right: 20px; /* Додаємо відступ справа для текстового поля, замість відступу зліва */
+    }
+
+    /* Стилі для зображення в кнопці */
+
+    .input-group img {
+        max-height: 20px;
+    }
+
+</style>
